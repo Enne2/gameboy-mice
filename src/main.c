@@ -86,21 +86,17 @@ void main(void) {
             // Disegna l'ASCII art e il messaggio di sconfitta!
             printf("\n\n");
             printf("      GAME OVER!\n\n");
-            printf("       /\\___/\\\n");
-            printf("      ( ^   ^ )\n");
-            printf("       >  w  <\n");
-            printf("        \\___/\n\n");
+            printf("      /\\_,,,_/\\\n");
+            printf("     | ' O O ' |\n");
+            printf("     |   >w<   |\n");
+            printf("      \\_/\"v\"\\_/\n\n");
             printf("  L'INVASIONE VINCE!\n");
             
-            // Suono di risata malefica (una specie di trillo)
-            NR10_REG = 0x1E; 
-            NR11_REG = 0x80;
-            NR12_REG = 0xF3; 
-            NR13_REG = 0x00;
-            NR14_REG = 0x87;
+            // Suono inquietante e fine della traccia allegra
+            play_game_over_music();
             
             while(1) {
-                update_music(); // La musica del tracollo continua
+                // Loop vuoto, la musica è ormai spenta a parte il riverbero maligno
                 wait_vbl_done();
             }
         }

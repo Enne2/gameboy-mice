@@ -303,3 +303,18 @@ void update_music(void) {
         frame_counter--;
     }
 }
+
+void play_game_over_music(void) {
+    // Silenzia bruscamente la melodia allegra, il basso e i tamburi
+    NR22_REG = 0x00; // Spegne CH2
+    NR32_REG = 0x00; // Spegne CH3
+    NR42_REG = 0x00; // Spegne CH4
+    
+    // Suona una nota discendente e inquietante sul Canale 1
+    // NR10: Sweep Time lungo, direzione discendente, shift
+    NR10_REG = 0x7F; 
+    NR11_REG = 0x80;
+    NR12_REG = 0xF7; 
+    NR13_REG = 0x50;
+    NR14_REG = 0x86;
+}
