@@ -32,6 +32,7 @@
 #define N_DS6 0x796
 #define N_E6  0x79C
 #define N_REST 0x000
+#define N_SUST 0xFFFF
 
 // ==========================================
 // TRACK 1: ARPEGGIO (CH1)
@@ -46,6 +47,10 @@
 #define A_D N_D4
 #define A_C5 N_C5
 #define A_E5 N_E5
+#define A_DS4 N_DS4
+#define A_FS4 N_FS4
+#define A_D4 N_D4
+#define A_F4 N_F4
 
 const uint16_t trk_arp_0[64] = {
     A_C, A_E, A_G, A_E, A_C, A_E, A_G, A_E, A_C, A_E, A_G, A_E, A_C, A_E, A_G, A_E,
@@ -190,9 +195,62 @@ const uint8_t trk_drum_3[64] = {
 };
 const uint8_t* const drum_parts[4] = { trk_drum_0, trk_drum_1, trk_drum_2, trk_drum_3 };
 
+// ==========================================
+// GAME OVER TRACK (64 ticks, 20 frames/tick)
+// ==========================================
+const uint16_t go_mel[64] = {
+    N_C5, N_SUST, N_SUST, N_SUST,  N_C5, N_SUST, N_SUST, N_SUST, 
+    N_C5, N_SUST, N_SUST, N_SUST,  N_SUST, N_SUST, N_D5, N_SUST,
+    N_DS5, N_SUST, N_SUST, N_SUST,  N_D5, N_SUST, N_SUST, N_SUST,
+    N_C5, N_SUST, N_SUST, N_SUST,  N_SUST, N_SUST, N_SUST, N_SUST,
+    
+    N_C5, N_SUST, N_SUST, N_SUST,  N_C5, N_SUST, N_SUST, N_SUST, 
+    N_C5, N_SUST, N_SUST, N_SUST,  N_SUST, N_SUST, N_B4, N_SUST,
+    N_C5, N_SUST, N_SUST, N_SUST,  N_G4, N_SUST, N_SUST, N_SUST,
+    N_C4, N_SUST, N_SUST, N_SUST,  N_SUST, N_SUST, N_SUST, N_SUST
+};
+
+const uint16_t go_bass[64] = {
+    B_C, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST,
+    B_C, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST,
+    B_C, N_SUST, N_SUST, N_SUST, B_G, N_SUST, N_SUST, N_SUST,
+    B_C, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST,
+
+    B_C, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST,
+    B_C, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST,
+    B_F, N_SUST, N_SUST, N_SUST, B_G, N_SUST, N_SUST, N_SUST,
+    B_C, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST
+};
+
+const uint16_t go_arp[64] = {
+    A_C, N_SUST, A_DS4, N_SUST, A_FS4, N_SUST, A_A, N_SUST,
+    A_C, N_SUST, A_DS4, N_SUST, A_FS4, N_SUST, A_A, N_SUST,
+    A_C, N_SUST, A_DS4, N_SUST, A_F4, N_SUST, A_B, N_SUST,
+    A_C, N_SUST, A_DS4, N_SUST, A_FS4, N_SUST, A_A, N_SUST,
+    
+    A_C, N_SUST, A_DS4, N_SUST, A_FS4, N_SUST, A_A, N_SUST,
+    A_C, N_SUST, A_DS4, N_SUST, A_FS4, N_SUST, A_A, N_SUST,
+    A_C, N_SUST, A_D4, N_SUST, A_F4, N_SUST, A_G, N_SUST,
+    A_C, N_SUST, N_REST, N_REST, N_REST, N_REST, N_REST, N_REST
+};
+
+const uint8_t go_drum[64] = {
+    1, 0, 0, 0,  1, 0, 0, 0,
+    1, 0, 0, 0,  1, 0, 0, 0,
+    1, 0, 0, 0,  1, 0, 0, 0,
+    1, 0, 0, 0,  1, 0, 0, 0,
+
+    1, 0, 0, 0,  1, 0, 0, 0,
+    1, 0, 0, 0,  1, 0, 0, 0,
+    1, 0, 0, 0,  1, 0, 0, 0,
+    1, 0, 0, 0,  0, 0, 0, 0
+};
+
 static uint16_t tick = 0;
 static uint8_t frame_counter = 0;
 static uint8_t sfx_timer = 0;
+static uint8_t game_over_mode = 0;
+
 #define FRAMES_PER_TICK 8 // Velocità del tracker
 
 void play_sfx_moan(void) {
@@ -233,88 +291,134 @@ void init_music(void) {
     tick = 0;
     frame_counter = 0;
     sfx_timer = 0;
+    game_over_mode = 0;
 }
 
 void update_music(void) {
+    if (game_over_mode == 2) return; // Traccia terminata
+    
     if (sfx_timer > 0) sfx_timer--;
     
     if (frame_counter == 0) {
-        
-        uint8_t part = (tick >> 6) & 0x03; // tick / 64
-        uint8_t sub = tick & 0x3F;         // tick % 64
-        
-        // --- CH1: Arpeggio ---
-        if (sfx_timer == 0) {
-            uint16_t f1 = arp_parts[part][sub];
-            NR10_REG = 0x00; 
-            NR11_REG = 0x80; 
-            NR12_REG = 0x51; // Volume basso, decadimento rapido
-            NR13_REG = (uint8_t)(f1 & 0xFF);
-            NR14_REG = 0x80 | ((f1 >> 8) & 0x07);
-        }
-        
-        // --- CH2: Melody ---
-        uint16_t f2 = mel_parts[part][sub];
-        if (f2 == N_REST) {
-            NR21_REG = 0x00; NR22_REG = 0x00; NR23_REG = 0x00; NR24_REG = 0x80;
+        if (game_over_mode == 1) {
+            // GAME OVER TRACKER (Tragico, 20 frames per tick)
+            if (tick >= 64) {
+                game_over_mode = 2; // Fine
+                NR22_REG = 0x00; NR32_REG = 0x00; NR42_REG = 0x00; NR12_REG = 0x00;
+                return;
+            }
+            
+            uint16_t f1 = go_arp[tick];
+            if (f1 != N_SUST) {
+                if (f1 == N_REST) {
+                    NR12_REG = 0x00;
+                } else {
+                    NR10_REG = 0x00; NR11_REG = 0x80; NR12_REG = 0x61;
+                    NR13_REG = (uint8_t)(f1 & 0xFF); NR14_REG = 0x80 | ((f1 >> 8) & 0x07);
+                }
+            }
+            
+            uint16_t f2 = go_mel[tick];
+            if (f2 != N_SUST) {
+                if (f2 == N_REST) {
+                    NR22_REG = 0x00;
+                } else {
+                    NR21_REG = 0x80; NR22_REG = 0xF7; // Lento decadimento
+                    NR23_REG = (uint8_t)(f2 & 0xFF); NR24_REG = 0x80 | ((f2 >> 8) & 0x07);
+                }
+            }
+            
+            uint16_t f3 = go_bass[tick];
+            if (f3 != N_SUST) {
+                if (f3 == N_REST) {
+                    NR32_REG = 0x00;
+                } else {
+                    NR32_REG = 0x20; 
+                    NR33_REG = (uint8_t)(f3 & 0xFF); NR34_REG = 0x80 | ((f3 >> 8) & 0x07);
+                }
+            }
+            
+            uint8_t d4 = go_drum[tick];
+            if (d4 == 1) {
+                NR41_REG = 0x00; NR42_REG = 0xF4; // Rullante profondo
+                NR43_REG = 0x33; NR44_REG = 0x80;
+            }
+            
+            tick++;
+            frame_counter = 20; // Lento e funereo
+            
         } else {
-            NR21_REG = 0x80; 
-            NR22_REG = 0xF2; // Volume alto
-            NR23_REG = (uint8_t)(f2 & 0xFF);
-            NR24_REG = 0x80 | ((f2 >> 8) & 0x07);
+            // NORMAL MUSIC TRACKER
+            uint8_t part = (tick >> 6) & 0x03; // tick / 64
+            uint8_t sub = tick & 0x3F;         // tick % 64
+            
+            // --- CH1: Arpeggio ---
+            if (sfx_timer == 0) {
+                uint16_t f1 = arp_parts[part][sub];
+                NR10_REG = 0x00; 
+                NR11_REG = 0x80; 
+                NR12_REG = 0x51; // Volume basso, decadimento rapido
+                NR13_REG = (uint8_t)(f1 & 0xFF);
+                NR14_REG = 0x80 | ((f1 >> 8) & 0x07);
+            }
+            
+            // --- CH2: Melody ---
+            uint16_t f2 = mel_parts[part][sub];
+            if (f2 == N_REST) {
+                NR21_REG = 0x00; NR22_REG = 0x00; NR23_REG = 0x00; NR24_REG = 0x80;
+            } else {
+                NR21_REG = 0x80; 
+                NR22_REG = 0xF2; // Volume alto
+                NR23_REG = (uint8_t)(f2 & 0xFF);
+                NR24_REG = 0x80 | ((f2 >> 8) & 0x07);
+            }
+            
+            // --- CH3: Bass ---
+            uint16_t f3 = bass_parts[part][sub];
+            if (f3 == N_REST) {
+                NR32_REG = 0x00; // Vol 0
+                NR34_REG = 0x80;
+            } else {
+                NR32_REG = 0x20; // Vol 100%
+                NR33_REG = (uint8_t)(f3 & 0xFF);
+                NR34_REG = 0x80 | ((f3 >> 8) & 0x07);
+            }
+            
+            // --- CH4: Drums ---
+            uint8_t d4 = drum_parts[part][sub];
+            if (d4 == 1) { // Kick
+                NR41_REG = 0x00;
+                NR42_REG = 0xF1;
+                NR43_REG = 0x11;
+                NR44_REG = 0x80;
+            } else if (d4 == 2) { // Snare
+                NR41_REG = 0x00;
+                NR42_REG = 0xF2;
+                NR43_REG = 0x51;
+                NR44_REG = 0x80;
+            } else if (d4 == 3) { // Hi-Hat
+                NR41_REG = 0x00;
+                NR42_REG = 0x51;
+                NR43_REG = 0x21;
+                NR44_REG = 0x80;
+            }
+            
+            // Avanza il tracker
+            tick++;
+            if (tick >= 256) tick = 0; // Loop completo
+            
+            frame_counter = FRAMES_PER_TICK;
         }
-        
-        // --- CH3: Bass ---
-        uint16_t f3 = bass_parts[part][sub];
-        if (f3 == N_REST) {
-            NR32_REG = 0x00; // Vol 0
-            NR34_REG = 0x80;
-        } else {
-            NR32_REG = 0x20; // Vol 100%
-            NR33_REG = (uint8_t)(f3 & 0xFF);
-            NR34_REG = 0x80 | ((f3 >> 8) & 0x07);
-        }
-        
-        // --- CH4: Drums ---
-        uint8_t d4 = drum_parts[part][sub];
-        if (d4 == 1) { // Kick
-            NR41_REG = 0x00;
-            NR42_REG = 0xF1;
-            NR43_REG = 0x11;
-            NR44_REG = 0x80;
-        } else if (d4 == 2) { // Snare
-            NR41_REG = 0x00;
-            NR42_REG = 0xF2;
-            NR43_REG = 0x51;
-            NR44_REG = 0x80;
-        } else if (d4 == 3) { // Hi-Hat
-            NR41_REG = 0x00;
-            NR42_REG = 0x51;
-            NR43_REG = 0x21;
-            NR44_REG = 0x80;
-        }
-        
-        // Avanza il tracker
-        tick++;
-        if (tick >= 256) tick = 0; // Loop completo
-        
-        frame_counter = FRAMES_PER_TICK;
     } else {
         frame_counter--;
     }
 }
 
 void play_game_over_music(void) {
-    // Silenzia bruscamente la melodia allegra, il basso e i tamburi
-    NR22_REG = 0x00; // Spegne CH2
-    NR32_REG = 0x00; // Spegne CH3
-    NR42_REG = 0x00; // Spegne CH4
+    // Inizializza il tracker funebre
+    game_over_mode = 1;
+    tick = 0;
+    frame_counter = 0;
     
-    // Suona una nota discendente e inquietante sul Canale 1
-    // NR10: Sweep Time lungo, direzione discendente, shift
-    NR10_REG = 0x7F; 
-    NR11_REG = 0x80;
-    NR12_REG = 0xF7; 
-    NR13_REG = 0x50;
-    NR14_REG = 0x86;
+    NR22_REG = 0x00; NR32_REG = 0x00; NR42_REG = 0x00; // Zittisce tutto
 }

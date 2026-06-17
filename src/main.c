@@ -99,11 +99,11 @@ void main(void) {
             for (uint8_t i = 0; i < 20; i++) rat_map[i] = 128 + i;
             set_bkg_tiles(7, 5, 5, 4, rat_map);
             
-            // Suono inquietante e fine della traccia allegra
+            // Avvia la tragica sequenza musicale di Game Over
             play_game_over_music();
             
             while(1) {
-                // Loop vuoto, la musica è ormai spenta a parte il riverbero maligno
+                update_music();
                 wait_vbl_done();
             }
         }
