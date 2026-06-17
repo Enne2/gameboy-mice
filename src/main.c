@@ -15,6 +15,7 @@
 #include "maze.h"
 #include "tiles.h"
 #include "rat_bg.h"
+#include "title_bg.h"
 
 #include "rat.h"
 #include "music.h"
@@ -24,18 +25,37 @@ void main(void) {
     uint8_t y, x;
     uint8_t black = 1;
     
-    // Attende il termine dell'aggiornamento verticale dello schermo (VBLANK).
-    // Caricare dati in VRAM al di fuori di questo periodo può causare tearing o artefatti.
+    // --- SCHERMATA DEL TITOLO ---
     wait_vbl_done();
+    set_bkg_data(0, 256, title_bg_tiles);
+    set_bkg_tiles(0, 0, 20, 18, title_bg_map);
     
-    // Invia i dati grafici (array TileData) dal banco ROM alla VRAM a partire dall'indice 0.
-    set_bkg_data(0, 5, TileData); // Carichiamo 5 tile: 1 strada + 4 siepi
+    SHOW_BKG;
+    DISPLAY_ON;
+    BGP_REG = 0b11100100;
     
-    // Inizializza il seme dei numeri casuali.
+    // Attendi la pressione di START
+    while (1) {
+        if (joypad() & J_START) {
+            break;
+        }
+        wait_vbl_done();
+    }
+    
+    // Attendi il rilascio del tasto per non passarlo al gioco
+    waitpadup();
+    
+    // Spegni il display per caricare i tile del gioco in sicurezza
+    DISPLAY_OFF;
+    
+    // Inizializza il seme casuale. Poiché il giocatore ha aspettato
+    // un tempo imprevedibile nel menu, DIV_REG produrrà un labirinto sempre nuovo!
     initrand(DIV_REG);
     
+    // Invia i dati grafici del gioco alla VRAM
+    set_bkg_data(0, 5, TileData); // 1 strada + 4 siepi
+    
     // La mappa background in memoria hardware è grande 32x32 tiles.
-    // Riempiamo preventivamente tutta quest'area nascosta con siepi casuali
     for (y = 0; y < 32; y++) {
         for (x = 0; x < 32; x++) {
             uint8_t rand_hedge = 1 + (rand() % 4);
