@@ -33,7 +33,7 @@ void drop_bomb(uint8_t x, uint8_t y) {
         bomb.x = x;
         bomb.y = y;
         bomb.timer = 180; // 3 seconds
-        play_sfx_plop(); // Generic drop sound
+        play_sfx_bomb_drop(); // Suono innesco
     }
 }
 

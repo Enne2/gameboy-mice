@@ -48,9 +48,11 @@ void init_rats(void) {
     OBP0_REG = 0xE4; // Palette standard
     
     // Posizioni iniziali garantite vuote (coordinate dispari)
-    uint8_t start_pos[2][2] = {
+    uint8_t start_pos[4][2] = {
         {1, 1},
-        {17, 15}
+        {17, 15},
+        {17, 1},
+        {1, 15}
     };
     
     for (uint8_t i = 0; i < MAX_RATS; i++) {
@@ -64,8 +66,8 @@ void init_rats(void) {
         move_sprite(rats[i].sprite_base_idx + 1, 0, 0);
     }
     
-    // Attiva i primi due topi
-    for (uint8_t i = 0; i < 2; i++) {
+    // Attiva i primi quattro topi
+    for (uint8_t i = 0; i < 4; i++) {
         rats[i].active = 1;
         rats[i].rat_x = start_pos[i][0];
         rats[i].rat_y = start_pos[i][1];

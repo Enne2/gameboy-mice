@@ -429,3 +429,11 @@ void play_sfx_explosion(void) {
     NR43_REG = 0x6E; 
     NR44_REG = 0xC0;
 }
+
+void play_sfx_bomb_drop(void) {
+    // Un suono di innesco "tsst" (miccia)
+    NR41_REG = 0x01; // Corto
+    NR42_REG = 0xA2; // Volume alto, decadimento rapido
+    NR43_REG = 0x22; // Frequenza alta, noise
+    NR44_REG = 0xC0; // Trigger
+}
