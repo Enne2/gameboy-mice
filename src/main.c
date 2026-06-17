@@ -85,12 +85,12 @@ void main(void) {
             
             // Disegna l'ASCII art e il messaggio di sconfitta!
             printf("\n\n");
-            printf("      GAME OVER!\n\n");
-            printf("      /\\_,,,_/\\\n");
-            printf("     | ' O O ' |\n");
-            printf("     |   >w<   |\n");
-            printf("      \\_/\"v\"\\_/\n\n");
-            printf("  L'INVASIONE VINCE!\n");
+            printf("     GAME OVER!\n\n");
+            printf("     /\\_..._/\\\n");
+            printf("    |  @   @  |\n");
+            printf("    |    v    |\n");
+            printf("     \\_/\"V\"\\_/\n\n");
+            printf(" L'INVASIONE VINCE!\n");
             
             // Suono inquietante e fine della traccia allegra
             play_game_over_music();
