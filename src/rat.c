@@ -101,20 +101,38 @@ void update_rats(void) {
     frame_counter++;
     uint8_t do_move = (frame_counter & 1); // Muovi di 1 pixel ogni 2 frame
     
-    // 1. Controlla collisioni per riproduzione (se sono sulla stessa cella e fermi)
+    // 1. Controlla collisioni per riproduzione usando una SPATIAL HASH GRID (O(N))
+    // Questa tecnica rimpiazza il doppio ciclo O(N^2) da 105 iterazioni.
+    // Usiamo array pre-allocati per creare "Linked Lists" statiche senza usare malloc!
+    uint8_t head[16];
+    uint8_t next_rat[MAX_RATS];
+    
+    // Inizializza i bucket dell'hash grid a vuoto (255)
+    for (uint8_t i = 0; i < 16; i++) head[i] = 255;
+    
+    // Popola la grid: ogni topo calcola il suo hash basato sulle coordinate e si inserisce in testa alla lista
+    for (uint8_t i = 0; i < MAX_RATS; i++) {
+        if (!rats[i].active || rats[i].reproduce_timer > 0 || rats[i].cooldown_timer > 0) {
+            next_rat[i] = 255;
+            continue;
+        }
+        uint8_t h = (rats[i].rat_x ^ rats[i].rat_y) & 15; // Hash velocissimo
+        next_rat[i] = head[h];
+        head[h] = i;
+    }
+    
+    // Ora per ogni topo controlliamo solo i topi che sono finiti nello STESSO bucket!
     for (uint8_t i = 0; i < MAX_RATS; i++) {
         if (!rats[i].active || rats[i].reproduce_timer > 0 || rats[i].cooldown_timer > 0) continue;
-        for (uint8_t j = i + 1; j < MAX_RATS; j++) {
-            if (!rats[j].active || rats[j].reproduce_timer > 0 || rats[j].cooldown_timer > 0) continue;
-            
-            // Early exit: se i due topi non sono nella stessa cella del labirinto, è inutile controllare i pixel esatti.
-            // Questo riduce enormemente il carico dei 105 check (15x15) per frame.
-            if (rats[i].rat_x != rats[j].rat_x || rats[i].rat_y != rats[j].rat_y) continue;
-            
-            if (rats[i].pixel_x == rats[j].pixel_x && rats[i].pixel_y == rats[j].pixel_y) {
+        
+        // Attraversa la linked list partendo dal topo "sotto" di lui nel bucket
+        uint8_t j = next_rat[i]; 
+        while (j != 255) {
+            if (rats[i].rat_x == rats[j].rat_x && rats[i].rat_y == rats[j].rat_y &&
+                rats[i].pixel_x == rats[j].pixel_x && rats[i].pixel_y == rats[j].pixel_y) {
+                
                 // Incontro riproduttivo!
-                // Usa 64 frames invece di 60 perché è un multiplo esatto di 16 (il tempo che un topo impiega
-                // per attraversare esattamente un tile di 8 pixel). Così non perdono la sincronia di fase globale!
+                // Usa 64 frames invece di 60 perché è un multiplo esatto di 16.
                 rats[i].reproduce_timer = 64; 
                 rats[j].reproduce_timer = 64;
                 rats[i].is_mother = 1; // Solo i farà spawnare il cucciolo
@@ -122,6 +140,7 @@ void update_rats(void) {
                 play_sfx_moan(); // Suono d'amore
                 break;
             }
+            j = next_rat[j]; // Passa al prossimo topo nello stesso bucket
         }
     }
     
