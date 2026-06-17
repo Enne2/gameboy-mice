@@ -27,19 +27,19 @@ void main(void) {
     wait_vbl_done();
     
     // Invia i dati grafici (array TileData) dal banco ROM alla VRAM a partire dall'indice 0.
-    set_bkg_data(0, 2, TileData);
-    
-    // La mappa background in memoria hardware è grande 32x32 tiles.
-    // Riempiamo preventivamente tutta quest'area nascosta con il tile Nero (indice 1),
-    // utile per mascherare i bordi quando lo schermo verrà "scrollato" successivamente.
-    for (y = 0; y < 32; y++) {
-        for (x = 0; x < 32; x++) {
-            set_bkg_tiles(x, y, 1, 1, &black);
-        }
-    }
+    set_bkg_data(0, 5, TileData); // Carichiamo 5 tile: 1 strada + 4 siepi
     
     // Inizializza il seme dei numeri casuali.
     initrand(DIV_REG);
+    
+    // La mappa background in memoria hardware è grande 32x32 tiles.
+    // Riempiamo preventivamente tutta quest'area nascosta con siepi casuali
+    for (y = 0; y < 32; y++) {
+        for (x = 0; x < 32; x++) {
+            uint8_t rand_hedge = 1 + (rand() % 4);
+            set_bkg_tiles(x, y, 1, 1, &rand_hedge);
+        }
+    }
     
     // Invoca la funzione logica per popolare l'array `maze` in memoria.
     generate_maze();
@@ -47,7 +47,11 @@ void main(void) {
     // Riversa l'array generato `maze` nella memoria del Background (VRAM Mappa).
     for (y = 0; y < MAZE_HEIGHT; y++) {
         for (x = 0; x < MAZE_WIDTH; x++) {
-            set_bkg_tiles(x, y, 1, 1, &maze[y][x]);
+            uint8_t tile_idx = maze[y][x];
+            if (tile_idx == 1) { // Se è un muro, scegli una siepe variante casuale
+                tile_idx = 1 + (rand() % 4);
+            }
+            set_bkg_tiles(x, y, 1, 1, &tile_idx);
         }
     }
     
