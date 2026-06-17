@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define MAX_RATS 15
+#define MAX_RATS 12
 
 void init_rats(void);
 void update_rats(void);
