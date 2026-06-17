@@ -30,7 +30,6 @@ palette_img[(np_img >= 64) & (np_img < 128)] = 2
 palette_img[(np_img >= 128) & (np_img < 192)] = 1
 palette_img[np_img >= 192] = 0
 
-# Simple 5x7 font
 font = {
     'A': [" ### ", "#   #", "#   #", "#####", "#   #", "#   #", "#   #"],
     'B': ["#### ", "#   #", "#   #", "#### ", "#   #", "#   #", "#### "],
@@ -45,7 +44,6 @@ font = {
     'Z': ["#####", "    #", "   # ", "  #  ", " #   ", "#    ", "#####"],
     'P': ["#### ", "#   #", "#   #", "#### ", "#    ", "#    ", "#    "],
     'R': ["#### ", "#   #", "#   #", "#### ", "# #  ", "#  # ", "#   #"],
-    'B': ["#### ", "#   #", "#   #", "#### ", "#   #", "#   #", "#### "],
     'O': [" ### ", "#   #", "#   #", "#   #", "#   #", "#   #", " ### "],
     'W': ["#   #", "#   #", "#   #", "# # #", "## ##", "#   #", "#   #"],
     'S': [" ### ", "#   #", "#    ", " ### ", "    #", "#   #", " ### "],
@@ -53,63 +51,51 @@ font = {
     'T': ["#####", "  #  ", "  #  ", "  #  ", "  #  ", "  #  ", "  #  "],
     'U': ["#   #", "#   #", "#   #", "#   #", "#   #", "#   #", " ### "],
     'N': ["#   #", "##  #", "# # #", "#  ##", "#   #", "#   #", "#   #"],
-    'O': [" ### ", "#   #", "#   #", "#   #", "#   #", "#   #", " ### "],
     'V': ["#   #", "#   #", "#   #", "#   #", "#   #", " # # ", "  #  "],
     'L': ["#    ", "#    ", "#    ", "#    ", "#    ", "#    ", "#####"],
-    'I': [" ### ", "  #  ", "  #  ", "  #  ", "  #  ", "  #  ", " ### "],
-    'C': [" ### ", "#   #", "#    ", "#    ", "#    ", "#   #", " ### "],
-    'D': ["#### ", "#   #", "#   #", "#   #", "#   #", "#   #", "#### "],
-    'F': ["#####", "#    ", "#    ", "#### ", "#    ", "#    ", "#    "],
-    'G': [" ### ", "#   #", "#    ", "# ###", "#   #", "#   #", " ### "],
-    'T': ["#####", "  #  ", "  #  ", "  #  ", "  #  ", "  #  ", "  #  "],
     ' ': ["     ", "     ", "     ", "     ", "     ", "     ", "     "]
 }
-# Map lowercases to uppercases for simplicity
-for c in "abcdefghijklmnopqrstuvwxyz":
-    if c.upper() in font:
-        font[c] = font[c.upper()]
 
 is_text_mask = np.zeros_like(palette_img, dtype=bool)
 
-def draw_text(text, start_y, scale=1, align="center"):
-    char_w = 5 * scale
-    char_h = 7 * scale
-    spacing = 1 * scale
-    if align == "center":
-        start_x = (160 - len(text) * (char_w + spacing)) // 2
-    else:
-        start_x = align
-        
-    box_pad = 2 * scale
-    for y in range(start_y - box_pad, start_y + char_h + box_pad):
-        for x in range(start_x - box_pad, start_x + len(text) * (char_w + spacing) + box_pad):
+def draw_text(text, start_y_tiles, scale=1):
+    tile_w = 8 * scale
+    tile_h = 8 * scale
+    start_x_tiles = (20 - len(text) * scale) // 2
+    
+    start_y = start_y_tiles * 8
+    start_x = start_x_tiles * 8
+    
+    # Draw black box perfectly aligned to tile grid
+    for y in range(start_y, start_y + tile_h):
+        for x in range(start_x, start_x + len(text) * tile_w):
             if 0 <= y < 144 and 0 <= x < 160:
-                palette_img[y, x] = 3 # Black background
+                palette_img[y, x] = 3
                 is_text_mask[y, x] = True
 
     for i, char in enumerate(text):
         if char in font:
             glyph = font[char]
+            # Center the 5x7 glyph inside the 8x8 logic
+            offset_x = (8 - 5) // 2
+            offset_y = (8 - 7) // 2
+            
             for row in range(7):
                 for col in range(5):
                     if glyph[row][col] == '#':
                         for sy in range(scale):
                             for sx in range(scale):
-                                py = start_y + row * scale + sy
-                                px = start_x + i * (char_w + spacing) + col * scale + sx
+                                py = start_y + (row + offset_y) * scale + sy
+                                px = start_x + i * tile_w + (col + offset_x) * scale + sx
                                 if 0 <= py < 144 and 0 <= px < 160:
-                                    palette_img[py, px] = 0 # White text
+                                    palette_img[py, px] = 0
                                     is_text_mask[py, px] = True
 
-# Title: MICE MAZE
-draw_text("MICE MAZE", 10, scale=2)
-
-# Subtitle
-draw_text("A GAME BY MATTEO", 45, scale=1)
-draw_text("BECAUSE HE WAS BORED", 55, scale=1)
-
-# Press start
-draw_text("PRESS START", 125, scale=1)
+# Align to 8x8 grid strictly
+draw_text("MICE MAZE", 1, scale=2)
+draw_text("A GAME BY MATTEO", 5, scale=1)
+draw_text("BECAUSE HE WAS BORED", 6, scale=1)
+draw_text("PRESS START", 16, scale=1)
 
 tiles = []
 is_text_tile = []
@@ -122,14 +108,21 @@ for y in range(0, 144, 8):
 
 unique_tiles = list(collections.OrderedDict.fromkeys(tiles))
 
+print(f"Total tiles: {len(tiles)}")
+print(f"Unique tiles before reduction: {len(unique_tiles)}")
+
 if len(unique_tiles) > 256:
     print("WARNING: More than 256 unique tiles! Reducing...")
     text_unique = list(collections.OrderedDict.fromkeys([tiles[i] for i in range(len(tiles)) if is_text_tile[i]]))
+    print(f"Text unique tiles: {len(text_unique)}")
+    
     counts = collections.Counter(tiles)
     for t in text_unique:
         del counts[t]
+        
     most_common = [t for t, c in counts.most_common(256 - len(text_unique))]
     reduced_unique = text_unique + most_common
+    
     for i in range(len(tiles)):
         if tiles[i] not in reduced_unique:
             t_arr = np.array(tiles[i])
@@ -145,6 +138,22 @@ if len(unique_tiles) > 256:
     print(f"Reduced to {len(unique_tiles)} unique tiles.")
 
 tile_map = [unique_tiles.index(t) for t in tiles]
+
+# Preview to ensure it's not broken
+preview_img = np.zeros((144, 160), dtype=np.uint8)
+for i, t in enumerate(tiles):
+    y = (i // 20) * 8
+    x = (i % 20) * 8
+    preview_img[y:y+8, x:x+8] = np.array(t)
+
+color_map = {0: 255, 1: 170, 2: 85, 3: 0}
+preview_rgb = np.zeros((144, 160, 3), dtype=np.uint8)
+for y in range(144):
+    for x in range(160):
+        c = color_map[preview_img[y, x]]
+        preview_rgb[y, x] = [c, c, c]
+
+Image.fromarray(preview_rgb).save('/tmp/preview_title_fixed.png')
 
 c_tiles = []
 for tile in unique_tiles:
@@ -176,5 +185,3 @@ with open('src/title_bg.c', 'w') as f:
     for i in range(0, len(tile_map), 20):
         f.write("    " + ", ".join([f"0x{b:02X}" for b in tile_map[i:i+20]]) + ",\n")
     f.write("};\n")
-
-print("Generated src/title_bg.h and src/title_bg.c")
