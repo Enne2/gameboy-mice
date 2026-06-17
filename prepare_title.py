@@ -93,7 +93,7 @@ def draw_text(text, start_y_tiles, scale=1):
                                     is_text_mask[py, px] = True
 
 # Align to 8x8 grid strictly
-draw_text("MICE! MAZE", 1, scale=2)
+draw_text("MICE!", 1, scale=2)
 draw_text("A GAME BY MATTEO", 5, scale=1)
 draw_text("BECAUSE HE WAS BORED", 6, scale=1)
 draw_text("PRESS START", 16, scale=1)

@@ -2,6 +2,7 @@
 #include "maze.h"
 #include <gb/gb.h>
 #include "bomb.h"
+#include "music.h"
 
 const unsigned char CursorSpriteData[] = {
     // Bordo quadrato 8x8 (Nero, colore 3 -> 11)
@@ -48,6 +49,11 @@ void update_cursor(void) {
     // Tasto A per sganciare la bomba
     if ((keys & J_A) && !(previous_keys & J_A)) {
         drop_bomb(cursor_x, cursor_y);
+    }
+    
+    // Tasto SELECT per attivare/disattivare la musica
+    if ((keys & J_SELECT) && !(previous_keys & J_SELECT)) {
+        toggle_music();
     }
     
     previous_keys = keys;

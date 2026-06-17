@@ -79,17 +79,25 @@ void init_rats(void) {
     }
 }
 
-void spawn_rat(uint8_t x, uint8_t y) {
+void spawn_rat(uint8_t x, uint8_t y, uint8_t initial_dir) {
     for (uint8_t i = 0; i < MAX_RATS; i++) {
         if (!rats[i].active) {
             rats[i].active = 1;
             rats[i].rat_x = x;
             rats[i].rat_y = y;
+            
+            // Imposta la direzione e target in base all'iniziale (se valida e se possibile muoversi in quella dir)
+            rats[i].current_dir = initial_dir;
             rats[i].target_x = x;
             rats[i].target_y = y;
+            if (initial_dir == 0 && y < MAZE_HEIGHT - 1 && maze[y+1][x] == 0) rats[i].target_y++;
+            else if (initial_dir == 1 && y > 0 && maze[y-1][x] == 0) rats[i].target_y--;
+            else if (initial_dir == 2 && x > 0 && maze[y][x-1] == 0) rats[i].target_x--;
+            else if (initial_dir == 3 && x < MAZE_WIDTH - 1 && maze[y][x+1] == 0) rats[i].target_x++;
+            else rats[i].current_dir = 255; // Nessuna direzione valida trovata
+            
             rats[i].pixel_x = x * 8;
             rats[i].pixel_y = y * 8;
-            rats[i].current_dir = 255;
             rats[i].reproduce_timer = 0;
             rats[i].cooldown_timer = 120; // Il cucciolo non si riproduce subito
             rats[i].is_mother = 0;
@@ -172,7 +180,7 @@ void update_rats(void) {
                 r->cooldown_timer = 120; // 2 secondi di pausa
                 if (r->is_mother) {
                     r->is_mother = 0;
-                    spawn_rat(r->rat_x, r->rat_y);
+                    spawn_rat(r->rat_x, r->rat_y, get_opposite(r->current_dir));
                 }
             }
             continue;
