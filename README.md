@@ -1,4 +1,4 @@
-# Game Boy Maze Generator & Rat Hunt
+# MICE! MAZE
 
 Un progetto per Game Boy, scritto in linguaggio C usando **GBDK-2020**. Nata come semplice generazione procedurale di un labirinto perfetto (Recursive Backtracker), l'applicazione si è evoluta integrando intelligenza artificiale, interattività e un motore audio custom.
 
