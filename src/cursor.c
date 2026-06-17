@@ -23,8 +23,8 @@ void init_cursor(void) {
     // (Gli indici 0-3 sono usati dai tile del topo)
     set_sprite_data(4, 1, CursorSpriteData);
     
-    // Usa lo sprite hardware numero 2 (0 e 1 sono il topo)
-    set_sprite_tile(2, 4); 
+    // Usa lo sprite hardware numero 39 (lasciando 0-38 liberi per i ratti)
+    set_sprite_tile(39, 4); 
 }
 
 void update_cursor(void) {
@@ -49,9 +49,9 @@ void update_cursor(void) {
     // Effetto lampeggiante: nascondi il cursore per metà del ciclo (ogni 16 frame)
     blink++;
     if (blink & 0x10) {
-        move_sprite(2, 0, 0); // Nascondi spostandolo fuori schermo
+        move_sprite(39, 0, 0); // Nascondi spostandolo fuori schermo
     } else {
         // Posiziona il cursore calcolando offset (12, 20) per centrarlo sulla griglia 8x8
-        move_sprite(2, cursor_x * 8 + 12, cursor_y * 8 + 20);
+        move_sprite(39, cursor_x * 8 + 12, cursor_y * 8 + 20);
     }
 }

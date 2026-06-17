@@ -58,8 +58,8 @@ void main(void) {
     // Trucco di centraggio (Hardware Scrolling):
     move_bkg(252, 252);
     
-    // Inizializza il topo autonomo nel punto di partenza (1, 1)
-    init_rat(1, 1);
+    // Inizializza i topi autonomi
+    init_rats();
     
     // Inizializza il cursore controllato dal giocatore
     init_cursor();
@@ -76,8 +76,8 @@ void main(void) {
         // Aggiorna la musica in background
         update_music();
         
-        // Aggiorna l'intelligenza artificiale e l'animazione del topo
-        update_rat();
+        // Aggiorna l'intelligenza artificiale e l'animazione dei topi
+        update_rats();
         
         // Aggiorna l'input del cursore del giocatore
         update_cursor();

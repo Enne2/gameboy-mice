@@ -192,7 +192,28 @@ const uint8_t* const drum_parts[4] = { trk_drum_0, trk_drum_1, trk_drum_2, trk_d
 
 static uint16_t tick = 0;
 static uint8_t frame_counter = 0;
+static uint8_t sfx_timer = 0;
 #define FRAMES_PER_TICK 8 // Velocità del tracker
+
+void play_sfx_moan(void) {
+    // Gemito: sweep up e vibrato
+    NR10_REG = 0x45; 
+    NR11_REG = 0x80;
+    NR12_REG = 0xF3; 
+    NR13_REG = 0x40;
+    NR14_REG = 0x86; 
+    sfx_timer = 40; // Blocca CH1 per 40 frame
+}
+
+void play_sfx_plop(void) {
+    // Plop: tono acuto e brevissimo
+    NR10_REG = 0x00;
+    NR11_REG = 0x80;
+    NR12_REG = 0xF1;
+    NR13_REG = 0xFF;
+    NR14_REG = 0x87;
+    sfx_timer = 15;
+}
 
 void init_music(void) {
     // Reset e attivazione master sound
@@ -211,21 +232,26 @@ void init_music(void) {
     
     tick = 0;
     frame_counter = 0;
+    sfx_timer = 0;
 }
 
 void update_music(void) {
+    if (sfx_timer > 0) sfx_timer--;
+    
     if (frame_counter == 0) {
         
         uint8_t part = (tick >> 6) & 0x03; // tick / 64
         uint8_t sub = tick & 0x3F;         // tick % 64
         
         // --- CH1: Arpeggio ---
-        uint16_t f1 = arp_parts[part][sub];
-        NR10_REG = 0x00; 
-        NR11_REG = 0x80; 
-        NR12_REG = 0x51; // Volume basso, decadimento rapido
-        NR13_REG = (uint8_t)(f1 & 0xFF);
-        NR14_REG = 0x80 | ((f1 >> 8) & 0x07);
+        if (sfx_timer == 0) {
+            uint16_t f1 = arp_parts[part][sub];
+            NR10_REG = 0x00; 
+            NR11_REG = 0x80; 
+            NR12_REG = 0x51; // Volume basso, decadimento rapido
+            NR13_REG = (uint8_t)(f1 & 0xFF);
+            NR14_REG = 0x80 | ((f1 >> 8) & 0x07);
+        }
         
         // --- CH2: Melody ---
         uint16_t f2 = mel_parts[part][sub];
