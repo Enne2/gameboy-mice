@@ -123,3 +123,17 @@ Learned from `kaspermeerts/tetris` disassembly and other sources:
   - Implement the original orientation-based rotation and collision cancel logic.
   - Replicate the original `rDIV`-based randomizer with 1-history reroll.
   - Add DAS, BCD scoring, and proper line-clear behavior.
+
+## Voice notification rule
+
+When the agent reaches an important deduction, conclusion, decision, milestone, or completes a significant action, it should not only write the result on screen.
+Also make it known to the user when you do a modification requested by the user and when the practical result of its modification is evident.
+It should also play a short spoken notification aloud on the local machine.
+
+Guidelines:
+- Use spoken audio for important conclusions, key findings, successful completions, warnings, and major state changes.
+- Keep spoken notifications short and clear.
+- Prefer the local speech tools available in the environment.
+- If the message is in Italian or the user is speaking Italian, prefer speaking in Italian.
+- **After Build and Test Analysis**: Every time you attempt a build and test run, upon analyzing the log, you MUST speak aloud to the user summarizing what is happening. Tell them if it worked or not, what your doubts are, and what the suspected cause might be.
+- **Implementation mechanism**: Use the `test_tts.py` script located in the project root (`/home/enne2/dev/aiDecompiling/relola/test_tts.py`) via direct execution (`python3 test_tts.py "Your message here"`). Do not use this as an MCP server; execute it directly as a background shell command.

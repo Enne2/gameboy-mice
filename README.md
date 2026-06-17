@@ -1,63 +1,41 @@
-# Game Boy Hello World
+# Game Boy Maze Generator & Rat Hunt
 
-Questa sottocartella contiene un minimo esempio di "Hello World" per Game Boy originale, compilato con **GBDK-2020** in C.
+Un progetto per Game Boy, scritto in linguaggio C usando **GBDK-2020**. Nata come semplice generazione procedurale di un labirinto perfetto (Recursive Backtracker), l'applicazione si è evoluta integrando intelligenza artificiale, interattività e un motore audio custom.
 
-## Struttura
+![Screenshot del Gioco](screenshot.png)
 
-- `main.c` — sorgente C.
-- `Makefile` — regola per compilare con `lcc` (GBDK-2020).
-- `hello.gb` — ROM Game Boy risultante (32 KB).
+## Funzionalità Aggiunte
+- **Intelligenza Artificiale (Rat)**: Un topolino animato (costruito tramite *Meta-Sprite* 16x8 per ottimizzare la memoria) esplora autonomamente e fluidamente i percorsi del labirinto.
+- **Cursore Interattivo (Giocatore)**: Un cursore lampeggiante controllabile dal giocatore tramite il D-Pad. Pone le basi per le meccaniche future di caccia al topo (piazzamento bombe).
+- **Tracker Musicale a 4 Canali**: Una sontuosa colonna sonora chiptune generata da un sequencer nativo scritto in C, senza l'uso di engine esterni. Sfrutta l'onda quadra, la Wave RAM customizzata per il basso, e il Noise per le percussioni, ruotando su una traccia in quattro parti da ~35 secondi.
 
-## Requisiti
+## Struttura del Progetto
+Al fine di mantenere un codice ordinato, pulito ed espandibile, i sorgenti sono stati suddivisi:
 
-GBDK-2020 e installato in `/home/enne2/.local/gbdk`. Se vuoi spostarlo altrove, aggiorna il `CC` nel `Makefile`.
+- `src/` : Contiene tutto il codice sorgente del gioco.
+  - `main.c`: Entry point, loop principale, inizializzazione hardware e rendering (scrolling).
+  - `maze.c` / `maze.h`: Core algoritmico per la generazione del labirinto.
+  - `rat.c` / `rat.h`: Logica dell'automa e gestione degli sprite hardware per l'animazione del topo.
+  - `cursor.c` / `cursor.h`: Logica interattiva del selettore del giocatore.
+  - `music.c` / `music.h`: Mini-tracker musicale, sequencer e definizione dei registri audio.
+  - `tiles.c` / `tiles.h`: Dichiarazione e definizione della grafica dei tile utilizzati.
+- `obj/` : Cartella autogenerata durante il processo di compilazione per immagazzinare i file intermedi (`.o` e metadati).
+- `tests/` : Script e utilities di testing.
+  - `test_pyboy.py`: Esegue l'emulatore PyBoy in modalità headless, salvando la prova del funzionamento in un'immagine temporanea.
+- `Makefile` : Sistema di build preconfigurato per GBDK-2020.
+- `maze.gb` : La ROM finale giocabile (generata dopo il build).
+- `test_audio.gb` / `test_audio.c`: Micro-rom dedicata alla diagnostica dell'hardware sonoro.
 
-## Build
-
+## Come Compilare
+Assicurati di aver installato la toolchain **GBDK-2020** nel path corretto (solitamente configurato su `~/.local/gbdk` in base a questo repository).
+Per compilare la ROM, basterà lanciare:
 ```bash
-cd gameboy-hello
 make
 ```
 
-## Test con emulatore
-
-### PyBoy (senza finestra, screenshot)
-
+## Come Testare
+Se vuoi validare la compilazione senza aprire GUI o se sei su un server remoto, puoi lanciare lo script headless:
 ```bash
-python3 - <<'PY'
-from pyboy import PyBoy
-rom = 'hello.gb'
-pyboy = PyBoy(rom, window='null')
-for _ in range(60*5):
-    pyboy.tick()
-pyboy.screen.image.save('/tmp/hello_gb.png')
-pyboy.stop()
-print('Screenshot salvato in /tmp/hello_gb.png')
-PY
+python3 tests/test_pyboy.py
 ```
-
-### PyBoy (con finestra SDL2)
-
-```bash
-python3 - <<'PY'
-from pyboy import PyBoy
-pyboy = PyBoy('hello.gb', window='SDL2')
-for _ in range(60*30):
-    pyboy.tick()
-pyboy.stop()
-PY
-```
-
-## Note
-
-- La ROM usa il logo Nintendo corretto e il checksum di header e valido.
-- Il testo viene visualizzato con `printf` sulla console testuale del Game Boy.
-- Il loop principale chiama `wait_vbl_done()` per sincronizzarsi con il VBlank.
-
-## Prossimi passi
-
-Da qui si puo partire per un vero gioco Game Boy (ad esempio Tetris), aggiungendo:
-- gestione di input tramite `joypad()`;
-- sprite OAM per i pezzi;
-- tilemap per il campo di gioco;
-- musica/effetti sonori con i 4 canali audio del Game Boy.
+Questo genererà un file PNG in locale (`/tmp/maze_gb.png`) per farti visualizzare l'output atteso della ROM. Puoi anche testare le ROM su emulatori diretti da terminale come `pyboy maze.gb`.
