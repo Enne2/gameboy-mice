@@ -1,4 +1,4 @@
-# MICE! MAZE
+# MICE!
 
 Un progetto per Game Boy, scritto in linguaggio C usando **GBDK-2020**. Nata come semplice generazione procedurale di un labirinto perfetto (Recursive Backtracker), l'applicazione si è evoluta integrando intelligenza artificiale, interattività e un motore audio custom.
 
@@ -6,7 +6,8 @@ Un progetto per Game Boy, scritto in linguaggio C usando **GBDK-2020**. Nata com
 
 ## Funzionalità Aggiunte
 - **Intelligenza Artificiale (Rat)**: Un topolino animato (costruito tramite *Meta-Sprite* 16x8 per ottimizzare la memoria) esplora autonomamente e fluidamente i percorsi del labirinto.
-- **Cursore Interattivo (Giocatore)**: Un cursore lampeggiante controllabile dal giocatore tramite il D-Pad. Pone le basi per le meccaniche future di caccia al topo (piazzamento bombe).
+- **Combattimento (Bomberman-style)**: Un cursore lampeggiante controllabile tramite D-Pad permette di sganciare bombe (tasto A) con conto alla rovescia ed esplosioni a croce letali per i topi.
+- **Toggle Audio**: Premi SELECT in qualsiasi momento per silenziare la colonna sonora e ascoltare in solitaria gli effetti sonori.
 - **Tracker Musicale a 4 Canali**: Una sontuosa colonna sonora chiptune generata da un sequencer nativo scritto in C, senza l'uso di engine esterni. Sfrutta l'onda quadra, la Wave RAM customizzata per il basso, e il Noise per le percussioni, ruotando su una traccia in quattro parti da ~35 secondi.
 
 ## Struttura del Progetto
