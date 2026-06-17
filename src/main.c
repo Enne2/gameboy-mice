@@ -14,6 +14,7 @@
 
 #include "maze.h"
 #include "tiles.h"
+#include "game_over_face.h"
 
 #include "rat.h"
 #include "music.h"
@@ -78,19 +79,25 @@ void main(void) {
             HIDE_SPRITES;
             move_bkg(0, 0); // Resetta lo scrolling hardware per il testo
             
+            // Inverti i colori dello schermo! Nero diventa bianco e viceversa.
+            BGP_REG = 0b00011011;
+            
             // Pulisce brutalmente lo schermo riempiendolo di spazi
             for (y = 0; y < 18; y++) {
                 printf("\n");
             }
             
-            // Disegna l'ASCII art e il messaggio di sconfitta!
+            // Carica la grafica personalizzata per il faccione (20 tiles) a partire dall'indice 128
+            set_bkg_data(128, 20, game_over_face_tiles);
+            
             printf("\n\n");
-            printf("     GAME OVER!\n\n");
-            printf("     /\\_..._/\\\n");
-            printf("    |  @   @  |\n");
-            printf("    |    v    |\n");
-            printf("     \\_/\"V\"\\_/\n\n");
+            printf("     GAME OVER!\n\n\n\n\n\n");
             printf(" L'INVASIONE VINCE!\n");
+            
+            // Disegna il faccione 5x4 al centro dello schermo (x=7, y=5)
+            uint8_t rat_map[20];
+            for (uint8_t i = 0; i < 20; i++) rat_map[i] = 128 + i;
+            set_bkg_tiles(7, 5, 5, 4, rat_map);
             
             // Suono inquietante e fine della traccia allegra
             play_game_over_music();
