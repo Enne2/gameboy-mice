@@ -10,6 +10,7 @@
 #include <gb/gb.h>
 #include <stdint.h>
 #include <rand.h>
+#include <stdio.h>
 
 #include "maze.h"
 #include "tiles.h"
@@ -73,6 +74,37 @@ void main(void) {
     
     // Game Loop primario
     while (1) {
+        if (game_over_flag) {
+            HIDE_SPRITES;
+            move_bkg(0, 0); // Resetta lo scrolling hardware per il testo
+            
+            // Pulisce brutalmente lo schermo riempiendolo di spazi
+            for (y = 0; y < 18; y++) {
+                printf("\n");
+            }
+            
+            // Disegna l'ASCII art e il messaggio di sconfitta!
+            printf("\n\n");
+            printf("      GAME OVER!\n\n");
+            printf("       /\\___/\\\n");
+            printf("      ( ^   ^ )\n");
+            printf("       >  w  <\n");
+            printf("        \\___/\n\n");
+            printf("  L'INVASIONE VINCE!\n");
+            
+            // Suono di risata malefica (una specie di trillo)
+            NR10_REG = 0x1E; 
+            NR11_REG = 0x80;
+            NR12_REG = 0xF3; 
+            NR13_REG = 0x00;
+            NR14_REG = 0x87;
+            
+            while(1) {
+                update_music(); // La musica del tracollo continua
+                wait_vbl_done();
+            }
+        }
+        
         // Aggiorna la musica in background
         update_music();
         

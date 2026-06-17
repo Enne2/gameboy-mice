@@ -3,7 +3,9 @@
 
 #include <stdint.h>
 
-#define MAX_RATS 12
+#define MAX_RATS 10
+
+extern uint8_t game_over_flag;
 
 void init_rats(void);
 void update_rats(void);

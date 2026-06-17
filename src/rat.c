@@ -32,6 +32,7 @@ typedef struct {
 } Rat;
 
 static Rat rats[MAX_RATS];
+uint8_t game_over_flag = 0;
 
 static uint8_t get_opposite(uint8_t dir) {
     if (dir == 0) return 1;
@@ -91,6 +92,14 @@ void spawn_rat(uint8_t x, uint8_t y) {
             rats[i].cooldown_timer = 120; // Il cucciolo non si riproduce subito
             rats[i].is_mother = 0;
             play_sfx_plop(); // Suono di nascita!
+            
+            uint8_t count = 0;
+            for (uint8_t j = 0; j < MAX_RATS; j++) {
+                if (rats[j].active) count++;
+            }
+            if (count >= MAX_RATS) {
+                game_over_flag = 1;
+            }
             break;
         }
     }
