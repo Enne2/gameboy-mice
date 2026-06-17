@@ -1,6 +1,7 @@
 #include "cursor.h"
 #include "maze.h"
 #include <gb/gb.h>
+#include "bomb.h"
 
 const unsigned char CursorSpriteData[] = {
     // Bordo quadrato 8x8 (Nero, colore 3 -> 11)
@@ -42,6 +43,11 @@ void update_cursor(void) {
     }
     if ((keys & J_RIGHT) && !(previous_keys & J_RIGHT)) {
         if (cursor_x < MAZE_WIDTH - 1) cursor_x++;
+    }
+    
+    // Tasto A per sganciare la bomba
+    if ((keys & J_A) && !(previous_keys & J_A)) {
+        drop_bomb(cursor_x, cursor_y);
     }
     
     previous_keys = keys;

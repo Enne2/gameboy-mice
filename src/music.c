@@ -422,3 +422,10 @@ void play_game_over_music(void) {
     
     NR22_REG = 0x00; NR32_REG = 0x00; NR42_REG = 0x00; // Zittisce tutto
 }
+
+void play_sfx_explosion(void) {
+    // Esplosione forte e lunga sul canale 4
+    NR42_REG = 0xF7; 
+    NR43_REG = 0x6E; 
+    NR44_REG = 0xC0;
+}

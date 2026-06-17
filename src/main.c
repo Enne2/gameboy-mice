@@ -20,6 +20,7 @@
 #include "rat.h"
 #include "music.h"
 #include "cursor.h"
+#include "bomb.h"
 
 void main(void) {
     uint8_t y, x;
@@ -86,6 +87,8 @@ void main(void) {
     // Inizializza il cursore controllato dal giocatore
     init_cursor();
     
+    init_bombs();
+    
     // Inizializza il sequencer musicale
     init_music();
     
@@ -125,6 +128,9 @@ void main(void) {
         
         // Aggiorna l'input del cursore del giocatore
         update_cursor();
+        
+        // Aggiorna le bombe
+        update_bombs();
         
         // Attendi la sincronizzazione con il monitor
         wait_vbl_done();

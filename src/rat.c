@@ -297,3 +297,18 @@ void update_rats(void) {
         }
     }
 }
+
+void kill_rats_at(uint8_t x, uint8_t y) {
+    for (uint8_t i = 0; i < MAX_RATS; i++) {
+        if (rats[i].active) {
+            // Uccidi se il topo è esattamente sulla cella esplosa
+            // Oppure se ci stava andando.
+            if ((rats[i].rat_x == x && rats[i].rat_y == y) ||
+                (rats[i].target_x == x && rats[i].target_y == y)) {
+                rats[i].active = 0;
+                move_sprite(rats[i].sprite_base_idx, 0, 0);
+                move_sprite(rats[i].sprite_base_idx + 1, 0, 0);
+            }
+        }
+    }
+}
