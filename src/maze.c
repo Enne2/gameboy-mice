@@ -7,7 +7,7 @@
 #include <rand.h>
 
 // Istanza globale in RAM (WRAM) della mappa del labirinto.
-uint8_t maze[MAZE_HEIGHT][MAZE_WIDTH];
+uint8_t maze[MAZE_HEIGHT][MAZE_PITCH];
 
 // Stack customizzato utilizzato per l'algoritmo Recursive Backtracker.
 // Si evitano le chiamate di funzione ricorsive per non esaurire

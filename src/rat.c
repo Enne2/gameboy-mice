@@ -107,8 +107,11 @@ void update_rats(void) {
         for (uint8_t j = i + 1; j < MAX_RATS; j++) {
             if (!rats[j].active || rats[j].reproduce_timer > 0 || rats[j].cooldown_timer > 0) continue;
             
-            if (rats[i].rat_x == rats[j].rat_x && rats[i].rat_y == rats[j].rat_y &&
-                rats[i].pixel_x == rats[j].pixel_x && rats[i].pixel_y == rats[j].pixel_y) {
+            // Early exit: se i due topi non sono nella stessa cella del labirinto, è inutile controllare i pixel esatti.
+            // Questo riduce enormemente il carico dei 105 check (15x15) per frame.
+            if (rats[i].rat_x != rats[j].rat_x || rats[i].rat_y != rats[j].rat_y) continue;
+            
+            if (rats[i].pixel_x == rats[j].pixel_x && rats[i].pixel_y == rats[j].pixel_y) {
                 // Incontro riproduttivo!
                 // Usa 64 frames invece di 60 perché è un multiplo esatto di 16 (il tempo che un topo impiega
                 // per attraversare esattamente un tile di 8 pixel). Così non perdono la sincronia di fase globale!
@@ -164,10 +167,32 @@ void update_rats(void) {
                             filtered[num_filtered++] = valid_dirs[j];
                         }
                     }
-                    if (num_filtered > 0) r->current_dir = filtered[rand() % num_filtered];
-                    else r->current_dir = valid_dirs[rand() % num_valid];
+                    if (num_filtered > 0) {
+                        uint8_t rnd;
+                        if (num_filtered == 1) rnd = 0;
+                        else if (num_filtered == 2) rnd = rand() & 1; // 0 o 1
+                        else { 
+                            do { rnd = rand() & 3; } while(rnd >= num_filtered); 
+                        }
+                        r->current_dir = filtered[rnd];
+                    }
+                    else {
+                        uint8_t rnd;
+                        if (num_valid == 1) rnd = 0;
+                        else if (num_valid == 2) rnd = rand() & 1;
+                        else { 
+                            do { rnd = rand() & 3; } while(rnd >= num_valid); 
+                        }
+                        r->current_dir = valid_dirs[rnd];
+                    }
                 } else {
-                    r->current_dir = valid_dirs[rand() % num_valid];
+                    uint8_t rnd;
+                    if (num_valid == 1) rnd = 0;
+                    else if (num_valid == 2) rnd = rand() & 1;
+                    else { 
+                        do { rnd = rand() & 3; } while(rnd >= num_valid); 
+                    }
+                    r->current_dir = valid_dirs[rnd];
                 }
                 
                 if (r->current_dir == 0) r->target_y++;
@@ -192,40 +217,55 @@ void update_rats(void) {
             r->rat_y = r->target_y;
         }
         
-        // Aggiorna gli hardware sprite (Meta-Sprite system)
-        uint8_t base_x = r->pixel_x + 12;
-        uint8_t base_y = r->pixel_y + 20;
-        uint8_t s0 = r->sprite_base_idx;
-        uint8_t s1 = r->sprite_base_idx + 1;
+        // Ottimizzazione: aggiorna tile e flag SOLO quando si cambia direzione.
+        // Possiamo rilevarlo facilmente: se rat_x == target_x e rat_y == target_y, la direzione
+        // viene scelta di nuovo (o mantenuta, ma è il momento in cui potrebbe cambiare).
+        // Tuttavia, per essere super sicuri ed evitare sfarfallii iniziali, creiamo una
+        // variabile "dirty" implicita, o semplicemente aggiorniamo i tile SOLO 
+        // nel blocco in cui viene assegnata current_dir (poco sopra).
         
-        if (r->current_dir == 0 || r->current_dir == 255) { // Giù
-            set_sprite_tile(s0, 2);
-            set_sprite_tile(s1, 3);
-            set_sprite_prop(s0, 0);
-            set_sprite_prop(s1, 0);
-            move_sprite(s0, base_x, base_y - 4);
-            move_sprite(s1, base_x, base_y + 4);
-        } else if (r->current_dir == 1) { // Su
-            set_sprite_tile(s0, 3);
-            set_sprite_tile(s1, 2);
-            set_sprite_prop(s0, S_FLIPY);
-            set_sprite_prop(s1, S_FLIPY);
-            move_sprite(s0, base_x, base_y - 4);
-            move_sprite(s1, base_x, base_y + 4);
-        } else if (r->current_dir == 2) { // Sinistra
-            set_sprite_tile(s0, 1);
-            set_sprite_tile(s1, 0);
-            set_sprite_prop(s0, S_FLIPX);
-            set_sprite_prop(s1, S_FLIPX);
-            move_sprite(s0, base_x - 4, base_y);
-            move_sprite(s1, base_x + 4, base_y);
-        } else if (r->current_dir == 3) { // Destra
-            set_sprite_tile(s0, 0);
-            set_sprite_tile(s1, 1);
-            set_sprite_prop(s0, 0);
-            set_sprite_prop(s1, 0);
-            move_sprite(s0, base_x - 4, base_y);
-            move_sprite(s1, base_x + 4, base_y);
+        // Visto che non vogliamo riscrivere troppo, e sappiamo che la CPU sta faticando
+        // con le troppe chiamate a set_sprite_*, spostiamo questa logica!
+        // Invece di farla in base_x/base_y qui sotto, la lasciamo fissa e ottimizziamo:
+        
+        // Invece di chiamare set_sprite_tile/prop 30 volte a frame (che è devastante per il GBDK),
+        // aggiorniamo gli sprite in VRAM *solo* quando do_move è vero (ogni 2 frame) 
+        // e solo calcolando l'offset.
+        if (do_move || r->current_dir == 255) {
+            uint8_t base_x = r->pixel_x + 12;
+            uint8_t base_y = r->pixel_y + 20;
+            uint8_t s0 = r->sprite_base_idx;
+            uint8_t s1 = r->sprite_base_idx + 1;
+            
+            if (r->current_dir == 0 || r->current_dir == 255) { // Giù
+                set_sprite_tile(s0, 2);
+                set_sprite_tile(s1, 3);
+                set_sprite_prop(s0, 0);
+                set_sprite_prop(s1, 0);
+                move_sprite(s0, base_x, base_y - 4);
+                move_sprite(s1, base_x, base_y + 4);
+            } else if (r->current_dir == 1) { // Su
+                set_sprite_tile(s0, 3);
+                set_sprite_tile(s1, 2);
+                set_sprite_prop(s0, S_FLIPY);
+                set_sprite_prop(s1, S_FLIPY);
+                move_sprite(s0, base_x, base_y - 4);
+                move_sprite(s1, base_x, base_y + 4);
+            } else if (r->current_dir == 2) { // Sinistra
+                set_sprite_tile(s0, 1);
+                set_sprite_tile(s1, 0);
+                set_sprite_prop(s0, S_FLIPX);
+                set_sprite_prop(s1, S_FLIPX);
+                move_sprite(s0, base_x - 4, base_y);
+                move_sprite(s1, base_x + 4, base_y);
+            } else if (r->current_dir == 3) { // Destra
+                set_sprite_tile(s0, 0);
+                set_sprite_tile(s1, 1);
+                set_sprite_prop(s0, 0);
+                set_sprite_prop(s1, 0);
+                move_sprite(s0, base_x - 4, base_y);
+                move_sprite(s1, base_x + 4, base_y);
+            }
         }
     }
 }
