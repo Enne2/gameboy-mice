@@ -184,10 +184,9 @@ void update_rats(void) {
                     spawn_rat(r->rat_x, r->rat_y, get_opposite(r->current_dir));
                 }
             }
-            continue;
         }
         
-        if (r->rat_x == r->target_x && r->rat_y == r->target_y) {
+        if (r->reproduce_timer == 0) {
             uint8_t valid_dirs[4];
             uint8_t num_valid = 0;
             
@@ -270,7 +269,7 @@ void update_rats(void) {
         // Invece di chiamare set_sprite_tile/prop 30 volte a frame (che è devastante per il GBDK),
         // aggiorniamo gli sprite in VRAM *solo* quando do_move è vero (ogni 2 frame) 
         // e solo calcolando l'offset.
-        if (do_move || r->current_dir == 255) {
+        if (do_move || r->current_dir == 255 || r->reproduce_timer > 0) {
             uint8_t base_x = r->pixel_x + 12;
             uint8_t base_y = r->pixel_y + 20;
             uint8_t s0 = r->sprite_base_idx;
