@@ -38,6 +38,11 @@ void main(void) {
     DISPLAY_ON;
     BGP_REG = 0b11100100;
     
+    // Inizializza le palette
+    BGP_REG = 0b11100100;
+    OBP0_REG = 0b11100100; // Normale (3=Nero, 2=GrigioS, 1=GrigioC, 0=Trasparente)
+    OBP1_REG = 0b11000000; // Pausa (3=Nero, 2=Bianco, 1=Bianco, 0=Trasparente)
+    
     // Attendi la pressione di START
     while (1) {
         if (joypad() & J_START) {
@@ -52,8 +57,7 @@ void main(void) {
     // Spegni il display per caricare i tile del gioco in sicurezza
     DISPLAY_OFF;
     
-    // Inizializza il seme casuale. Poiché il giocatore ha aspettato
-    // un tempo imprevedibile nel menu, DIV_REG produrrà un labirinto sempre nuovo!
+    // Inizializza il seme casuale.
     initrand(DIV_REG);
     
     // Invia i dati grafici del gioco alla VRAM
@@ -61,12 +65,11 @@ void main(void) {
     
     // Inizializza la grafica della PAUSA come Sprite
     set_sprite_data(11, 5, PauseTiles); // 5 tile per la pausa (P,A,U,S,E)
-    // Nascondi gli sprite del menu pausa all'avvio
-    move_sprite(20, 0, 0);
-    move_sprite(21, 0, 0);
-    move_sprite(22, 0, 0);
-    move_sprite(23, 0, 0);
-    move_sprite(24, 0, 0);
+    // Nascondi gli sprite del menu pausa e imposta OBP1
+    for (uint8_t i = 20; i <= 24; i++) {
+        set_sprite_prop(i, S_PALETTE); // Usa OBP1
+        move_sprite(i, 0, 0);
+    }
     
     // La mappa background in memoria hardware è grande 32x32 tiles.
     // Inizializziamo il "fuori mappa" con siepi solide (mask 15 -> indice 21)
@@ -92,8 +95,7 @@ void main(void) {
                 if (x > 0 && maze[y][x-1] == 1) mask |= 1; // Ovest
                 tile_idx = 6 + mask; // Offset 6 per le siepi
             } else {
-                // Scegli una variante casuale di pavimento per le stanze e i percorsi
-                // 0 è la base pulita, 1-5 sono crepe e detriti (rarità maggiore per la 0)
+                // Scegli una variante casuale di pavimento
                 uint8_t r = rand() % 10;
                 if (r < 5) tile_idx = 0;
                 else tile_idx = 1 + (r % 5);
@@ -148,6 +150,13 @@ void main(void) {
         
         // Controllo per la Pausa
         if ((keys & J_START) && !(main_prev_keys & J_START)) {
+            // Effetto sonoro pausa
+            NR10_REG = 0x00;
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0x73;
+            NR14_REG = 0x86;
+            
             // Mostra la scritta PAUSE al centro dello schermo usando gli sprite
             set_sprite_tile(20, 11);
             set_sprite_tile(21, 12);
@@ -165,9 +174,15 @@ void main(void) {
             while (1) {
                 uint8_t p_keys = joypad();
                 if (p_keys & J_START) {
+                    // Effetto sonoro resume
+                    NR10_REG = 0x00;
+                    NR11_REG = 0x81;
+                    NR12_REG = 0x43;
+                    NR13_REG = 0x73;
+                    NR14_REG = 0x86;
                     break; // Esci dalla pausa
                 }
-                update_music(); // La musica continua in pausa
+                // update_music(); // MUSICA BLOCCATA (commentato intenzionalmente)
                 wait_vbl_done();
             }
             
