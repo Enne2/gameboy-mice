@@ -589,29 +589,29 @@ void play_game_over_music(void) {
 
 void play_sfx_explosion(void) {
     // Esplosione molto forte e lunga sul canale 4
-    NR41_REG = 0x3F; // Lunghezza
-    NR42_REG = 0xF7; // Volume max, decadimento lento
-    NR43_REG = 0x47; // Frequenza bassa/rumore scuro
-    NR44_REG = 0xC0; // Trigger
-    sfx_timer = 40; // Proteggi CH4 e CH1
+    NR41_REG = 0x00; 
+    NR42_REG = 0xF7; // Volume max (0xF), decay lento (7)
+    NR43_REG = 0x57; // Rumore molto basso e cupo
+    NR44_REG = 0x80; // Trigger (senza length counter)
+    sfx_timer = 45;  // Proteggi CH4
 }
 
 void play_sfx_shotgun(void) {
     // Sparo di fucile molto forte, corto e secco sul canale 4
-    NR41_REG = 0x01; // Corto
+    NR41_REG = 0x00; 
     NR42_REG = 0xF2; // Volume max, decadimento super rapido
-    NR43_REG = 0x33; // Frequenza da sparo
-    NR44_REG = 0xC0; // Trigger
+    NR43_REG = 0x22; // Rumore bianco medio, secco
+    NR44_REG = 0x80; // Trigger (senza length counter)
     sfx_timer = 20;
 }
 
 void play_sfx_bomb_drop(void) {
     // Un suono di innesco "tsst" (miccia)
-    NR41_REG = 0x01; // Corto
+    NR41_REG = 0x00; 
     NR42_REG = 0xA2; // Volume alto, decadimento rapido
-    NR43_REG = 0x22; // Frequenza alta, noise
-    NR44_REG = 0xC0; // Trigger
-    sfx_timer = 15; // Proteggi per la durata del suono
+    NR43_REG = 0x12; // Frequenza alta, sibilo
+    NR44_REG = 0x80; // Trigger (senza length counter)
+    sfx_timer = 15; 
 }
 
 void play_title_music(void) {

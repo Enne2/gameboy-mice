@@ -75,12 +75,26 @@ void update_cursor(void) {
     
     // Arma secondaria: Fucile a pompa (Tasto B)
     static uint16_t shotgun_cooldown = 0;
+    static uint8_t shotgun_blast_timer = 0;
+    
     if (shotgun_cooldown > 0) shotgun_cooldown--;
+    if (shotgun_blast_timer > 0) {
+        shotgun_blast_timer--;
+        if (shotgun_blast_timer == 0) {
+            move_sprite(24, 0, 0); // Nascondi l'effetto sparo
+        }
+    }
 
     if ((keys & J_B) && !(previous_keys & J_B)) {
         if (shotgun_cooldown == 0) {
             play_sfx_shotgun();
             kill_rats_at(cursor_x, cursor_y);
+            
+            // Mostra l'effetto dello sparo (usiamo lo sprite 24 e il tile 8 che è il centro dell'esplosione)
+            set_sprite_tile(24, 8);
+            move_sprite(24, cursor_x * 8 + 12, cursor_y * 8 + 20);
+            shotgun_blast_timer = 15; // Visibile per un quarto di secondo
+            
             shotgun_cooldown = 180; // 3 secondi di ricarica a 60 FPS
         }
     }

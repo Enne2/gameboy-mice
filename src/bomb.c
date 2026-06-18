@@ -19,11 +19,17 @@ typedef struct {
 
 static Bomb bomb;
 
+static const uint8_t exp_sprite_pool[] = {
+    20, 21, 22, 23, 29, 30, 31, 32, 33, 34, 35, 36, 37
+};
+#define EXP_POOL_SIZE 13
+
 void init_bombs(void) {
     bomb.state = BOMB_STATE_INACTIVE;
     set_sprite_data(5, 6, BombSpriteData);
-    for(uint8_t i = 34; i <= 38; i++) {
-        move_sprite(i, 0, 0);
+    move_sprite(38, 0, 0); // Bomba centrale
+    for(uint8_t i = 0; i < EXP_POOL_SIZE; i++) {
+        move_sprite(exp_sprite_pool[i], 0, 0);
     }
 }
 
@@ -37,9 +43,10 @@ void drop_bomb(uint8_t x, uint8_t y) {
     }
 }
 
-static void hide_explosion() {
-    for(uint8_t i = 34; i <= 38; i++) {
-        move_sprite(i, 0, 0);
+static void hide_explosion(void) {
+    move_sprite(38, 0, 0);
+    for(uint8_t i = 0; i < EXP_POOL_SIZE; i++) {
+        move_sprite(exp_sprite_pool[i], 0, 0);
     }
 }
 
@@ -74,18 +81,21 @@ void update_bombs(void) {
             
             play_sfx_explosion();
             
-            set_sprite_tile(38, 8);
+            set_sprite_tile(38, 8); // Centro esplosione
             move_sprite(38, px, py);
             do_explosion_damage(bomb.x, bomb.y);
+            
+            uint8_t pool_idx = 0;
             
             // Su
             uint8_t yy = bomb.y;
             while (yy > 0) {
                 yy--;
                 if (maze[yy][bomb.x] != 0) break;
-                if (yy == bomb.y - 1) {
-                    set_sprite_tile(34, 10);
-                    move_sprite(34, px, py - 8);
+                if (pool_idx < EXP_POOL_SIZE) {
+                    uint8_t sp = exp_sprite_pool[pool_idx++];
+                    set_sprite_tile(sp, 10); // Fiamma verticale
+                    move_sprite(sp, px, (yy * 8) + 20);
                 }
                 do_explosion_damage(bomb.x, yy);
             }
@@ -95,9 +105,10 @@ void update_bombs(void) {
             while (yy < MAZE_HEIGHT - 1) {
                 yy++;
                 if (maze[yy][bomb.x] != 0) break;
-                if (yy == bomb.y + 1) {
-                    set_sprite_tile(35, 10);
-                    move_sprite(35, px, py + 8);
+                if (pool_idx < EXP_POOL_SIZE) {
+                    uint8_t sp = exp_sprite_pool[pool_idx++];
+                    set_sprite_tile(sp, 10); // Fiamma verticale
+                    move_sprite(sp, px, (yy * 8) + 20);
                 }
                 do_explosion_damage(bomb.x, yy);
             }
@@ -107,9 +118,10 @@ void update_bombs(void) {
             while (xx > 0) {
                 xx--;
                 if (maze[bomb.y][xx] != 0) break;
-                if (xx == bomb.x - 1) {
-                    set_sprite_tile(36, 9);
-                    move_sprite(36, px - 8, py);
+                if (pool_idx < EXP_POOL_SIZE) {
+                    uint8_t sp = exp_sprite_pool[pool_idx++];
+                    set_sprite_tile(sp, 9); // Fiamma orizzontale
+                    move_sprite(sp, (xx * 8) + 12, py);
                 }
                 do_explosion_damage(xx, bomb.y);
             }
@@ -119,9 +131,10 @@ void update_bombs(void) {
             while (xx < MAZE_WIDTH - 1) {
                 xx++;
                 if (maze[bomb.y][xx] != 0) break;
-                if (xx == bomb.x + 1) {
-                    set_sprite_tile(37, 9);
-                    move_sprite(37, px + 8, py);
+                if (pool_idx < EXP_POOL_SIZE) {
+                    uint8_t sp = exp_sprite_pool[pool_idx++];
+                    set_sprite_tile(sp, 9); // Fiamma orizzontale
+                    move_sprite(sp, (xx * 8) + 12, py);
                 }
                 do_explosion_damage(xx, bomb.y);
             }
