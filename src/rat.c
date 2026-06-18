@@ -98,6 +98,33 @@ void spawn_rat(uint8_t x, uint8_t y, uint8_t initial_dir) {
             
             rats[i].pixel_x = x * 8;
             rats[i].pixel_y = y * 8;
+            
+            // Forza il disegno dello sprite IMMEDIATAMENTE affinché sia visibile durante il secondo di "stun"
+            {
+                uint8_t base_x = rats[i].pixel_x + 12;
+                uint8_t base_y = rats[i].pixel_y + 20;
+                uint8_t s0 = rats[i].sprite_base_idx;
+                uint8_t s1 = rats[i].sprite_base_idx + 1;
+                
+                if (rats[i].current_dir == 0 || rats[i].current_dir == 255) {
+                    set_sprite_tile(s0, 2); set_sprite_tile(s1, 3);
+                    set_sprite_prop(s0, 0); set_sprite_prop(s1, 0);
+                    move_sprite(s0, base_x, base_y - 4); move_sprite(s1, base_x, base_y + 4);
+                } else if (rats[i].current_dir == 1) {
+                    set_sprite_tile(s0, 3); set_sprite_tile(s1, 2);
+                    set_sprite_prop(s0, S_FLIPY); set_sprite_prop(s1, S_FLIPY);
+                    move_sprite(s0, base_x, base_y - 4); move_sprite(s1, base_x, base_y + 4);
+                } else if (rats[i].current_dir == 2) {
+                    set_sprite_tile(s0, 1); set_sprite_tile(s1, 0);
+                    set_sprite_prop(s0, S_FLIPX); set_sprite_prop(s1, S_FLIPX);
+                    move_sprite(s0, base_x - 4, base_y); move_sprite(s1, base_x + 4, base_y);
+                } else if (rats[i].current_dir == 3) {
+                    set_sprite_tile(s0, 0); set_sprite_tile(s1, 1);
+                    set_sprite_prop(s0, 0); set_sprite_prop(s1, 0);
+                    move_sprite(s0, base_x - 4, base_y); move_sprite(s1, base_x + 4, base_y);
+                }
+            }
+            
             // Il nuovo ratto resta fermo 1 secondo (60 frame) alla nascita usando lo stesso timer
             rats[i].reproduce_timer = 60; 
             rats[i].cooldown_timer = 120; // Il cucciolo non si riproduce subito
