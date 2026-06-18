@@ -3,6 +3,7 @@
 #include <gb/gb.h>
 #include "bomb.h"
 #include "music.h"
+#include "rat.h"
 
 const unsigned char CursorSpriteData[] = {
     // Bordo quadrato 8x8 (Nero, colore 3 -> 11)
@@ -70,6 +71,18 @@ void update_cursor(void) {
     // Tasto A per sganciare la bomba
     if ((keys & J_A) && !(previous_keys & J_A)) {
         drop_bomb(cursor_x, cursor_y);
+    }
+    
+    // Arma secondaria: Fucile a pompa (Tasto B)
+    static uint16_t shotgun_cooldown = 0;
+    if (shotgun_cooldown > 0) shotgun_cooldown--;
+
+    if ((keys & J_B) && !(previous_keys & J_B)) {
+        if (shotgun_cooldown == 0) {
+            play_sfx_shotgun();
+            kill_rats_at(cursor_x, cursor_y);
+            shotgun_cooldown = 180; // 3 secondi di ricarica a 60 FPS
+        }
     }
     
     // Tasto SELECT per attivare/disattivare la musica

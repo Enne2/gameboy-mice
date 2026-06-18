@@ -247,10 +247,7 @@ void main(void) {
         
         uint8_t keys = joypad();
         
-        // Debug cheat: forza vittoria con il tasto B
-        if ((keys & J_B) && !(main_prev_keys & J_B)) {
-            victory_flag = 1;
-        }
+        // Debug cheat rimosso: il tasto B ora è usato per l'arma secondaria
         
         // Controllo per la Pausa
         if ((keys & J_START) && !(main_prev_keys & J_START)) {

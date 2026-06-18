@@ -588,11 +588,21 @@ void play_game_over_music(void) {
 }
 
 void play_sfx_explosion(void) {
-    // Esplosione forte e lunga sul canale 4
-    NR42_REG = 0xF7; 
-    NR43_REG = 0x6E; 
-    NR44_REG = 0xC0;
-    sfx_timer = 30; // Proteggi CH4 e CH1
+    // Esplosione molto forte e lunga sul canale 4
+    NR41_REG = 0x3F; // Lunghezza
+    NR42_REG = 0xF7; // Volume max, decadimento lento
+    NR43_REG = 0x47; // Frequenza bassa/rumore scuro
+    NR44_REG = 0xC0; // Trigger
+    sfx_timer = 40; // Proteggi CH4 e CH1
+}
+
+void play_sfx_shotgun(void) {
+    // Sparo di fucile molto forte, corto e secco sul canale 4
+    NR41_REG = 0x01; // Corto
+    NR42_REG = 0xF2; // Volume max, decadimento super rapido
+    NR43_REG = 0x33; // Frequenza da sparo
+    NR44_REG = 0xC0; // Trigger
+    sfx_timer = 20;
 }
 
 void play_sfx_bomb_drop(void) {

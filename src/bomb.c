@@ -78,25 +78,52 @@ void update_bombs(void) {
             move_sprite(38, px, py);
             do_explosion_damage(bomb.x, bomb.y);
             
-            if (bomb.y > 0 && maze[bomb.y - 1][bomb.x] == 0) {
-                set_sprite_tile(34, 10);
-                move_sprite(34, px, py - 8);
-                do_explosion_damage(bomb.x, bomb.y - 1);
+            // Su
+            uint8_t yy = bomb.y;
+            while (yy > 0) {
+                yy--;
+                if (maze[yy][bomb.x] != 0) break;
+                if (yy == bomb.y - 1) {
+                    set_sprite_tile(34, 10);
+                    move_sprite(34, px, py - 8);
+                }
+                do_explosion_damage(bomb.x, yy);
             }
-            if (bomb.y < MAZE_HEIGHT - 1 && maze[bomb.y + 1][bomb.x] == 0) {
-                set_sprite_tile(35, 10);
-                move_sprite(35, px, py + 8);
-                do_explosion_damage(bomb.x, bomb.y + 1);
+            
+            // Giù
+            yy = bomb.y;
+            while (yy < MAZE_HEIGHT - 1) {
+                yy++;
+                if (maze[yy][bomb.x] != 0) break;
+                if (yy == bomb.y + 1) {
+                    set_sprite_tile(35, 10);
+                    move_sprite(35, px, py + 8);
+                }
+                do_explosion_damage(bomb.x, yy);
             }
-            if (bomb.x > 0 && maze[bomb.y][bomb.x - 1] == 0) {
-                set_sprite_tile(36, 9);
-                move_sprite(36, px - 8, py);
-                do_explosion_damage(bomb.x - 1, bomb.y);
+            
+            // Sinistra
+            uint8_t xx = bomb.x;
+            while (xx > 0) {
+                xx--;
+                if (maze[bomb.y][xx] != 0) break;
+                if (xx == bomb.x - 1) {
+                    set_sprite_tile(36, 9);
+                    move_sprite(36, px - 8, py);
+                }
+                do_explosion_damage(xx, bomb.y);
             }
-            if (bomb.x < MAZE_WIDTH - 1 && maze[bomb.y][bomb.x + 1] == 0) {
-                set_sprite_tile(37, 9);
-                move_sprite(37, px + 8, py);
-                do_explosion_damage(bomb.x + 1, bomb.y);
+            
+            // Destra
+            xx = bomb.x;
+            while (xx < MAZE_WIDTH - 1) {
+                xx++;
+                if (maze[bomb.y][xx] != 0) break;
+                if (xx == bomb.x + 1) {
+                    set_sprite_tile(37, 9);
+                    move_sprite(37, px + 8, py);
+                }
+                do_explosion_damage(xx, bomb.y);
             }
         }
     } else if (bomb.state == BOMB_STATE_EXPLODING) {
