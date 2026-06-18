@@ -6,6 +6,7 @@
 #define MAX_RATS 10
 
 extern uint8_t game_over_flag;
+extern uint8_t victory_flag;
 
 void init_rats(void);
 void update_rats(void);

@@ -33,6 +33,7 @@ typedef struct {
 
 static Rat rats[MAX_RATS];
 uint8_t game_over_flag = 0;
+uint8_t victory_flag = 0;
 
 static uint8_t get_opposite(uint8_t dir) {
     if (dir == 0) return 1;
@@ -145,8 +146,33 @@ void spawn_rat(uint8_t x, uint8_t y, uint8_t initial_dir) {
 
 void update_rats(void) {
     static uint8_t frame_counter = 0;
+    static uint16_t single_rat_timer = 0;
     frame_counter++;
     uint8_t do_move = (frame_counter & 1); // Muovi di 1 pixel ogni 2 frame
+    
+    // Controlla quanti topi sono attivi per la meccanica di riproduzione forzata
+    uint8_t active_count = 0;
+    for (uint8_t i = 0; i < MAX_RATS; i++) {
+        if (rats[i].active) active_count++;
+    }
+    
+    if (active_count == 1) {
+        single_rat_timer++;
+        if (single_rat_timer >= 600) { // 10 secondi a 60 fps
+            single_rat_timer = 0;
+            // Spawn 2 nuovi topi
+            for(uint8_t s = 0; s < 2; s++) {
+                uint8_t rx, ry;
+                do {
+                    rx = rand() % MAZE_WIDTH;
+                    ry = rand() % MAZE_HEIGHT;
+                } while(maze[ry][rx] != 0);
+                spawn_rat(rx, ry, rand() % 4);
+            }
+        }
+    } else {
+        single_rat_timer = 0;
+    }
     
     // 1. Controlla collisioni per riproduzione usando una SPATIAL HASH GRID (O(N))
     // Questa tecnica rimpiazza il doppio ciclo O(N^2) da 105 iterazioni.
@@ -337,6 +363,7 @@ void update_rats(void) {
 }
 
 void kill_rats_at(uint8_t x, uint8_t y) {
+    uint8_t active_count = 0;
     for (uint8_t i = 0; i < MAX_RATS; i++) {
         if (rats[i].active) {
             // Uccidi se il topo è esattamente sulla cella esplosa
@@ -346,7 +373,12 @@ void kill_rats_at(uint8_t x, uint8_t y) {
                 rats[i].active = 0;
                 move_sprite(rats[i].sprite_base_idx, 0, 0);
                 move_sprite(rats[i].sprite_base_idx + 1, 0, 0);
+            } else {
+                active_count++;
             }
         }
+    }
+    if (active_count == 0) {
+        victory_flag = 1;
     }
 }

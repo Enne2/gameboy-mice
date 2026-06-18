@@ -12,5 +12,6 @@ void play_sfx_bomb_drop(void);
 
 void play_game_over_music(void);
 void play_title_music(void);
+void play_victory_music(void);
 
 #endif

@@ -5,7 +5,7 @@ SRC_DIR = src
 OBJ_DIR = obj
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
-OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
+OBJS = $(OBJ_DIR)/bomb.o $(OBJ_DIR)/bomb_gfx.o $(OBJ_DIR)/cursor.o $(OBJ_DIR)/main.o $(OBJ_DIR)/maze.o $(OBJ_DIR)/mockup_gfx.o $(OBJ_DIR)/music.o $(OBJ_DIR)/numbers_gfx.o $(OBJ_DIR)/pause_gfx.o $(OBJ_DIR)/rat_bg.o $(OBJ_DIR)/rat.o $(OBJ_DIR)/tiles.o $(OBJ_DIR)/title_bg.o $(OBJ_DIR)/victory_bg.o
 
 TARGET = maze.gb
 AUDIO_TARGET = test_audio.gb

@@ -16,6 +16,7 @@
 #include "tiles.h"
 #include "rat_bg.h"
 #include "title_bg.h"
+#include "victory_bg.h"
 
 #include "rat.h"
 #include "music.h"
@@ -128,55 +129,69 @@ void main(void) {
     SHOW_SPRITES;
     DISPLAY_ON;
     
-    // Variabili per il timer
-    uint16_t play_time_seconds = 0;
+    // Variabili per il timer (formato BCD array per evitare divisioni a 16 bit)
+    uint8_t timer_digits[4] = {0, 0, 0, 0};
     uint8_t timer_frames = 0;
+    
+    // Setup iniziale del timer (prima di entrare nel loop)
+    set_sprite_tile(25, 25);
+    set_sprite_tile(26, 25);
+    set_sprite_tile(27, 25);
+    set_sprite_tile(28, 25);
+    
+    set_sprite_prop(25, S_PALETTE);
+    set_sprite_prop(26, S_PALETTE);
+    set_sprite_prop(27, S_PALETTE);
+    set_sprite_prop(28, S_PALETTE);
+    
+    // Y in basso (152 = margine inferiore visibile: 152 - 16 = 136), X a destra
+    move_sprite(25, 136, 152);
+    move_sprite(26, 144, 152);
+    move_sprite(27, 152, 152);
+    move_sprite(28, 160, 152);
     
     // Game Loop primario
     while (1) {
-        if (game_over_flag) {
+        if (game_over_flag || victory_flag) {
             HIDE_SPRITES;
             move_bkg(0, 0); // Resetta lo scrolling hardware
             
             // Ripristina la palette normale (Nero=3, Bianco=0)
             BGP_REG = 0b11100100;
             
-            // Carica i 256 tiles generati dall'immagine completa
-            set_bkg_data(0, 256, rat_bg_tiles);
-            
-            // Disegna la mappa 20x18 a tutto schermo
-            set_bkg_tiles(0, 0, 20, 18, rat_bg_map);
-            
-            // Avvia la tragica sequenza musicale di Game Over
-            play_game_over_music();
+            if (victory_flag) {
+                // Carica background di vittoria
+                set_bkg_data(0, 256, victory_bg_tiles);
+                set_bkg_tiles(0, 0, 20, 18, victory_bg_map);
+                play_victory_music();
+            } else {
+                // Carica background di sconfitta
+                set_bkg_data(0, 256, rat_bg_tiles);
+                set_bkg_tiles(0, 0, 20, 18, rat_bg_map);
+                play_game_over_music();
+            }
             
             SHOW_SPRITES;
             while(1) {
                 update_music();
                 
-                // Continua a disegnare il timer (punteggio finale) sopra il Game Over
-                {
-                    uint16_t temp = play_time_seconds;
-                    uint8_t d3 = temp / 1000; temp %= 1000;
-                    uint8_t d2 = temp / 100; temp %= 100;
-                    uint8_t d1 = temp / 10; temp %= 10;
-                    uint8_t d0 = temp;
+                if (victory_flag) {
+                    // Disegna il timer (punteggio finale) sopra la vittoria
+                    set_sprite_tile(25, 25 + timer_digits[0]);
+                    set_sprite_tile(26, 25 + timer_digits[1]);
+                    set_sprite_tile(27, 25 + timer_digits[2]);
+                    set_sprite_tile(28, 25 + timer_digits[3]);
                     
-                    set_sprite_tile(25, 25 + d3);
-                    set_sprite_tile(26, 25 + d2);
-                    set_sprite_tile(27, 25 + d1);
-                    set_sprite_tile(28, 25 + d0);
-                    
-                    // Palette S_PALETTE per mantenere il timer bianco.
                     set_sprite_prop(25, S_PALETTE);
                     set_sprite_prop(26, S_PALETTE);
                     set_sprite_prop(27, S_PALETTE);
                     set_sprite_prop(28, S_PALETTE);
                     
-                    move_sprite(25, 136, 152);
-                    move_sprite(26, 144, 152);
-                    move_sprite(27, 152, 152);
-                    move_sprite(28, 160, 152);
+                    // Centrato e in basso
+                    move_sprite(25, 68, 144);
+                    move_sprite(26, 76, 144);
+                    move_sprite(27, 84, 144);
+                    move_sprite(28, 92, 144);
                 }
                 
                 wait_vbl_done();
@@ -192,33 +207,34 @@ void main(void) {
         timer_frames++;
         if (timer_frames >= 60) {
             timer_frames = 0;
-            play_time_seconds++;
-            if (play_time_seconds > 9999) play_time_seconds = 9999;
-        }
-        
-        // Disegna il timer
-        {
-            uint16_t temp = play_time_seconds;
-            uint8_t d3 = temp / 1000; temp %= 1000;
-            uint8_t d2 = temp / 100; temp %= 100;
-            uint8_t d1 = temp / 10; temp %= 10;
-            uint8_t d0 = temp;
             
-            set_sprite_tile(25, 25 + d3);
-            set_sprite_tile(26, 25 + d2);
-            set_sprite_tile(27, 25 + d1);
-            set_sprite_tile(28, 25 + d0);
+            // Incremento stile BCD per evitare divisioni dispendiose
+            timer_digits[3]++;
+            if (timer_digits[3] > 9) {
+                timer_digits[3] = 0;
+                timer_digits[2]++;
+                if (timer_digits[2] > 9) {
+                    timer_digits[2] = 0;
+                    timer_digits[1]++;
+                    if (timer_digits[1] > 9) {
+                        timer_digits[1] = 0;
+                        timer_digits[0]++;
+                        if (timer_digits[0] > 9) {
+                            // Cap a 9999
+                            timer_digits[0] = 9;
+                            timer_digits[1] = 9;
+                            timer_digits[2] = 9;
+                            timer_digits[3] = 9;
+                        }
+                    }
+                }
+            }
             
-            set_sprite_prop(25, S_PALETTE);
-            set_sprite_prop(26, S_PALETTE);
-            set_sprite_prop(27, S_PALETTE);
-            set_sprite_prop(28, S_PALETTE);
-            
-            // Y in basso (152 = margine inferiore visibile: 152 - 16 = 136), X a destra
-            move_sprite(25, 136, 152);
-            move_sprite(26, 144, 152);
-            move_sprite(27, 152, 152);
-            move_sprite(28, 160, 152);
+            // Aggiorna i tile SOLO una volta al secondo invece di ogni frame!
+            set_sprite_tile(25, 25 + timer_digits[0]);
+            set_sprite_tile(26, 25 + timer_digits[1]);
+            set_sprite_tile(27, 25 + timer_digits[2]);
+            set_sprite_tile(28, 25 + timer_digits[3]);
         }
         
         uint8_t keys = joypad();
