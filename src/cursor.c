@@ -34,16 +34,16 @@ void update_cursor(void) {
     
     // Movimento controllato dal D-PAD
     if ((keys & J_UP) && !(previous_keys & J_UP)) {
-        if (cursor_y > 0) cursor_y--;
+        if (cursor_y > 1) cursor_y--;
     }
     if ((keys & J_DOWN) && !(previous_keys & J_DOWN)) {
-        if (cursor_y < MAZE_HEIGHT - 1) cursor_y++;
+        if (cursor_y < MAZE_HEIGHT - 2) cursor_y++;
     }
     if ((keys & J_LEFT) && !(previous_keys & J_LEFT)) {
-        if (cursor_x > 0) cursor_x--;
+        if (cursor_x > 1) cursor_x--;
     }
     if ((keys & J_RIGHT) && !(previous_keys & J_RIGHT)) {
-        if (cursor_x < MAZE_WIDTH - 1) cursor_x++;
+        if (cursor_x < MAZE_WIDTH - 2) cursor_x++;
     }
     
     // Tasto A per sganciare la bomba
