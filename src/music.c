@@ -43,7 +43,6 @@
 #define A_G N_G4
 #define A_GS N_GS4
 #define A_A N_A4
-#define A_AS N_AS4
 #define A_B N_B4
 #define A_D N_D4
 #define A_C5 N_C5
@@ -89,11 +88,9 @@ const uint16_t* const arp_parts[4] = { trk_arp_0, trk_arp_1, trk_arp_2, trk_arp_
 #define M_G N_G5
 #define M_GS N_GS5
 #define M_A N_A5
-#define M_AS N_AS5
 #define M_B N_B5
 #define M_C6 N_C6
 #define M_D6 N_D6
-#define M_DS N_DS5
 #define M_E6 N_E6
 #define M__ N_REST
 
@@ -133,7 +130,6 @@ const uint16_t* const mel_parts[4] = { trk_mel_0, trk_mel_1, trk_mel_2, trk_mel_
 #define B_G N_G4
 #define B_GS N_GS4
 #define B_A N_A4
-#define B_AS N_AS4
 #define B_B N_B4
 #define B_C5 N_C5
 #define B_E5 N_E5
@@ -263,54 +259,15 @@ const uint16_t title_bass[16] = {
 };
 
 // ==========================================
-// MACABRE VICTORY FANFARE (64 ticks, 8 frames/tick)
+// VICTORY TRACK (16 ticks loop)
 // ==========================================
-const uint16_t vic_mel[64] = {
-    M_C, N_REST, M_C, N_REST, M_C, N_REST, M_C, N_SUST,
-    N_GS4, N_SUST, N_SUST, N_SUST, N_AS4, N_SUST, N_SUST, N_SUST,
-    M_C, N_SUST, N_SUST, N_SUST, N_AS4, N_REST, M_C, N_SUST,
-    N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST,
-
-    M_C, N_REST, M_C, N_REST, M_C, N_REST, M_C, N_SUST,
-    N_GS4, N_SUST, N_SUST, N_SUST, N_AS4, N_SUST, N_SUST, N_SUST,
-    M_C, N_SUST, N_SUST, N_SUST, M_DS, N_REST, M_C, N_SUST,
-    N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST
+const uint16_t victory_mel[16] = {
+    M_C, M_E, M_G, M__, M_C6, M_G, M_E, M__,
+    M_F, M_A, M_C6, M__, M_E6, M_C6, M_G, M__
 };
-
-const uint16_t vic_bass[64] = {
-    B_C, N_REST, B_C, N_REST, B_C, N_REST, B_C, N_REST,
-    B_GS, N_REST, B_GS, N_REST, B_AS, N_REST, B_AS, N_REST,
-    B_C, N_REST, B_C, N_REST, B_C, N_REST, B_C, N_REST,
-    B_C, N_REST, B_C, N_REST, B_C, N_REST, B_C, N_REST,
-
-    B_C, N_REST, B_C, N_REST, B_C, N_REST, B_C, N_REST,
-    B_GS, N_REST, B_GS, N_REST, B_AS, N_REST, B_AS, N_REST,
-    B_C, N_REST, B_C, N_REST, B_C, N_REST, B_C, N_REST,
-    B_C, N_REST, B_C, N_REST, B_C, N_REST, B_C, N_REST
-};
-
-const uint16_t vic_arp[64] = {
-    A_C, N_SUST, A_DS4, N_SUST, A_G, N_SUST, A_C5, N_SUST,
-    A_GS, N_SUST, A_C, N_SUST, A_AS, N_SUST, A_D4, N_SUST,
-    A_C, N_SUST, A_DS4, N_SUST, A_G, N_SUST, A_C5, N_SUST,
-    A_C, N_SUST, A_DS4, N_SUST, A_G, N_SUST, A_C5, N_SUST,
-    
-    A_C, N_SUST, A_DS4, N_SUST, A_G, N_SUST, A_C5, N_SUST,
-    A_GS, N_SUST, A_C, N_SUST, A_AS, N_SUST, A_D4, N_SUST,
-    A_C, N_SUST, A_DS4, N_SUST, A_G, N_SUST, A_C5, N_SUST,
-    A_C, N_REST, N_REST, N_REST, N_REST, N_REST, N_REST, N_REST
-};
-
-const uint8_t vic_drum[64] = {
-    1, 0, 1, 0, 1, 0, 1, 0,
-    1, 0, 1, 0, 1, 0, 1, 0,
-    1, 2, 1, 2, 1, 2, 1, 2,
-    1, 0, 2, 0, 1, 0, 2, 0,
-
-    1, 0, 1, 0, 1, 0, 1, 0,
-    1, 0, 1, 0, 1, 0, 1, 0,
-    1, 2, 1, 2, 1, 2, 1, 2,
-    1, 0, 0, 0, 0, 0, 0, 0
+const uint16_t victory_bass[16] = {
+    B_C, B_E, B_G, B_E, B_C, B_E, B_G, B_E,
+    B_F, B_A, B_C5, B_A, B_C, B_G, B_C, B__
 };
 
 static uint16_t tick = 0;
@@ -413,51 +370,35 @@ void update_music(void) {
             tick++;
             frame_counter = 8; // Veloce e allegro
         } else if (game_over_mode == 4) {
-            // MACABRE VICTORY TRACK
-            if (tick >= 64) {
-                game_over_mode = 2; // Fine
-                NR22_REG = 0x00; NR32_REG = 0x00; NR42_REG = 0x00; NR12_REG = 0x00;
-                return;
+            // VICTORY TRACK
+            if (tick >= 16) {
+                tick = 0; // LOOP
             }
             
-            uint16_t f1 = vic_arp[tick];
-            if (f1 != N_SUST) {
-                if (f1 == N_REST) {
-                    NR12_REG = 0x00;
-                } else {
-                    NR10_REG = 0x00; NR11_REG = 0x80; NR12_REG = 0x51;
-                    NR13_REG = (uint8_t)(f1 & 0xFF); NR14_REG = 0x80 | ((f1 >> 8) & 0x07);
-                }
+            uint16_t f2 = victory_mel[tick];
+            if (f2 == N_REST) {
+                NR22_REG = 0x00;
+            } else {
+                NR21_REG = 0x80; NR22_REG = 0xF2;
+                NR23_REG = (uint8_t)(f2 & 0xFF); NR24_REG = 0x80 | ((f2 >> 8) & 0x07);
             }
             
-            uint16_t f2 = vic_mel[tick];
-            if (f2 != N_SUST) {
-                if (f2 == N_REST) {
-                    NR22_REG = 0x00;
-                } else {
-                    NR21_REG = 0x80; NR22_REG = 0xF7;
-                    NR23_REG = (uint8_t)(f2 & 0xFF); NR24_REG = 0x80 | ((f2 >> 8) & 0x07);
-                }
+            uint16_t f3 = victory_bass[tick];
+            if (f3 == N_REST) {
+                NR32_REG = 0x00;
+            } else {
+                NR32_REG = 0x20; 
+                NR33_REG = (uint8_t)(f3 & 0xFF); NR34_REG = 0x80 | ((f3 >> 8) & 0x07);
             }
             
-            uint16_t f3 = vic_bass[tick];
-            if (f3 != N_SUST) {
-                if (f3 == N_REST) {
-                    NR32_REG = 0x00;
-                } else {
-                    NR32_REG = 0x20; 
-                    NR33_REG = (uint8_t)(f3 & 0xFF); NR34_REG = 0x80 | ((f3 >> 8) & 0x07);
-                }
-            }
-            
-            uint8_t d4 = vic_drum[tick];
-            if (d4 == 1) {
-                NR41_REG = 0x00; NR42_REG = 0xF2;
-                NR43_REG = 0x51; NR44_REG = 0x80;
+            if (tick % 2 == 0) {
+                NR41_REG = 0x00; NR42_REG = 0x51; NR43_REG = 0x21; NR44_REG = 0x80;
+            } else {
+                NR42_REG = 0x00;
             }
             
             tick++;
-            frame_counter = 8; // Più veloce e marziale
+            frame_counter = 6; // Molto veloce e festoso
         } else if (game_over_mode == 1) {
             // GAME OVER TRACKER (Tragico, 20 frames per tick)
             if (tick >= 64) {
@@ -588,30 +529,20 @@ void play_game_over_music(void) {
 }
 
 void play_sfx_explosion(void) {
-    // Esplosione molto forte e lunga sul canale 4
-    NR41_REG = 0x00; 
-    NR42_REG = 0xF7; // Volume max (0xF), decay lento (7)
-    NR43_REG = 0x57; // Rumore molto basso e cupo
-    NR44_REG = 0x80; // Trigger (senza length counter)
-    sfx_timer = 45;  // Proteggi CH4
-}
-
-void play_sfx_shotgun(void) {
-    // Sparo di fucile molto forte, corto e secco sul canale 4
-    NR41_REG = 0x00; 
-    NR42_REG = 0xF2; // Volume max, decadimento super rapido
-    NR43_REG = 0x22; // Rumore bianco medio, secco
-    NR44_REG = 0x80; // Trigger (senza length counter)
-    sfx_timer = 20;
+    // Esplosione forte e lunga sul canale 4
+    NR42_REG = 0xF7; 
+    NR43_REG = 0x6E; 
+    NR44_REG = 0xC0;
+    sfx_timer = 30; // Proteggi CH4 e CH1
 }
 
 void play_sfx_bomb_drop(void) {
     // Un suono di innesco "tsst" (miccia)
-    NR41_REG = 0x00; 
+    NR41_REG = 0x01; // Corto
     NR42_REG = 0xA2; // Volume alto, decadimento rapido
-    NR43_REG = 0x12; // Frequenza alta, sibilo
-    NR44_REG = 0x80; // Trigger (senza length counter)
-    sfx_timer = 15; 
+    NR43_REG = 0x22; // Frequenza alta, noise
+    NR44_REG = 0xC0; // Trigger
+    sfx_timer = 15; // Proteggi per la durata del suono
 }
 
 void play_title_music(void) {
@@ -646,6 +577,16 @@ void play_victory_music(void) {
     NR30_REG = 0x00;
     volatile uint8_t *wave_ptr = (volatile uint8_t *)0xFF30;
     for (uint8_t i = 0; i < 16; i++) {
+        wave_ptr[i] = wave_ram[i];
+    }
+    NR30_REG = 0x80;
+    
+    game_over_mode = 4; // Victory mode
+    tick = 0;
+    frame_counter = 0;
+    
+    NR12_REG = 0; NR22_REG = 0; NR32_REG = 0; NR42_REG = 0;
+}
         wave_ptr[i] = wave_ram[i];
     }
     NR30_REG = 0x80;
