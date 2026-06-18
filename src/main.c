@@ -22,6 +22,7 @@
 #include "cursor.h"
 #include "bomb.h"
 #include "pause_gfx.h"
+#include "numbers_gfx.h"
 
 static uint8_t main_prev_keys = 0;
 
@@ -72,6 +73,9 @@ void main(void) {
         set_sprite_prop(i, S_PALETTE); // Usa OBP1
         move_sprite(i, 0, 0);
     }
+    
+    // Inizializza i tile dei numeri (0-9) per il timer (li carichiamo all'indice 25)
+    set_sprite_data(25, 10, NumberTiles);
     
     // La mappa background in memoria hardware è grande 32x32 tiles.
     // Inizializziamo il "fuori mappa" con siepi solide (mask 15 -> indice 21)
@@ -124,6 +128,10 @@ void main(void) {
     SHOW_SPRITES;
     DISPLAY_ON;
     
+    // Variabili per il timer
+    uint16_t play_time_seconds = 0;
+    uint8_t timer_frames = 0;
+    
     // Game Loop primario
     while (1) {
         if (game_over_flag) {
@@ -142,8 +150,35 @@ void main(void) {
             // Avvia la tragica sequenza musicale di Game Over
             play_game_over_music();
             
+            SHOW_SPRITES;
             while(1) {
                 update_music();
+                
+                // Continua a disegnare il timer (punteggio finale) sopra il Game Over
+                {
+                    uint16_t temp = play_time_seconds;
+                    uint8_t d3 = temp / 1000; temp %= 1000;
+                    uint8_t d2 = temp / 100; temp %= 100;
+                    uint8_t d1 = temp / 10; temp %= 10;
+                    uint8_t d0 = temp;
+                    
+                    set_sprite_tile(25, 25 + d3);
+                    set_sprite_tile(26, 25 + d2);
+                    set_sprite_tile(27, 25 + d1);
+                    set_sprite_tile(28, 25 + d0);
+                    
+                    // Palette S_PALETTE per mantenere il timer bianco.
+                    set_sprite_prop(25, S_PALETTE);
+                    set_sprite_prop(26, S_PALETTE);
+                    set_sprite_prop(27, S_PALETTE);
+                    set_sprite_prop(28, S_PALETTE);
+                    
+                    move_sprite(25, 136, 152);
+                    move_sprite(26, 144, 152);
+                    move_sprite(27, 152, 152);
+                    move_sprite(28, 160, 152);
+                }
+                
                 wait_vbl_done();
                 uint8_t keys = joypad();
                 if ((keys & J_START) && !(main_prev_keys & J_START)) {
@@ -151,6 +186,39 @@ void main(void) {
                 }
                 main_prev_keys = keys;
             }
+        }
+        
+        // Logica del timer (incrementa ogni 60 frame = 1 secondo)
+        timer_frames++;
+        if (timer_frames >= 60) {
+            timer_frames = 0;
+            play_time_seconds++;
+            if (play_time_seconds > 9999) play_time_seconds = 9999;
+        }
+        
+        // Disegna il timer
+        {
+            uint16_t temp = play_time_seconds;
+            uint8_t d3 = temp / 1000; temp %= 1000;
+            uint8_t d2 = temp / 100; temp %= 100;
+            uint8_t d1 = temp / 10; temp %= 10;
+            uint8_t d0 = temp;
+            
+            set_sprite_tile(25, 25 + d3);
+            set_sprite_tile(26, 25 + d2);
+            set_sprite_tile(27, 25 + d1);
+            set_sprite_tile(28, 25 + d0);
+            
+            set_sprite_prop(25, S_PALETTE);
+            set_sprite_prop(26, S_PALETTE);
+            set_sprite_prop(27, S_PALETTE);
+            set_sprite_prop(28, S_PALETTE);
+            
+            // Y in basso (152 = margine inferiore visibile: 152 - 16 = 136), X a destra
+            move_sprite(25, 136, 152);
+            move_sprite(26, 144, 152);
+            move_sprite(27, 152, 152);
+            move_sprite(28, 160, 152);
         }
         
         uint8_t keys = joypad();
