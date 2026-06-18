@@ -54,13 +54,14 @@ void main(void) {
     initrand(DIV_REG);
     
     // Invia i dati grafici del gioco alla VRAM
-    set_bkg_data(0, 5, TileData); // 1 strada + 4 siepi
+    set_bkg_data(0, 17, TileData); // 1 strada + 16 varianti autotile
     
     // La mappa background in memoria hardware è grande 32x32 tiles.
+    // Inizializziamo il "fuori mappa" con siepi solide (mask 15 = 1 + 15)
     for (y = 0; y < 32; y++) {
         for (x = 0; x < 32; x++) {
-            uint8_t rand_hedge = 1 + (rand() % 4);
-            set_bkg_tiles(x, y, 1, 1, &rand_hedge);
+            uint8_t solid_hedge = 16; 
+            set_bkg_tiles(x, y, 1, 1, &solid_hedge);
         }
     }
     
@@ -71,8 +72,13 @@ void main(void) {
     for (y = 0; y < MAZE_HEIGHT; y++) {
         for (x = 0; x < MAZE_WIDTH; x++) {
             uint8_t tile_idx = maze[y][x];
-            if (tile_idx == 1) { // Se è un muro, scegli una siepe variante casuale
-                tile_idx = 1 + (rand() % 4);
+            if (tile_idx == 1) { // Se è un muro, usa autotiling
+                uint8_t mask = 0;
+                if (y > 0 && maze[y-1][x] == 1) mask |= 8; // Nord
+                if (x < MAZE_WIDTH-1 && maze[y][x+1] == 1) mask |= 4; // Est
+                if (y < MAZE_HEIGHT-1 && maze[y+1][x] == 1) mask |= 2; // Sud
+                if (x > 0 && maze[y][x-1] == 1) mask |= 1; // Ovest
+                tile_idx = 1 + mask;
             }
             set_bkg_tiles(x, y, 1, 1, &tile_idx);
         }
