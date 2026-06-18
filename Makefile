@@ -8,11 +8,15 @@ SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 
 TARGET = maze.gb
+AUDIO_TARGET = test_audio.gb
 
-all: $(TARGET)
+all: $(TARGET) $(AUDIO_TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+
+$(AUDIO_TARGET): test_audio.c $(OBJ_DIR)/music.o
+	$(CC) $(CFLAGS) -o $(AUDIO_TARGET) test_audio.c $(OBJ_DIR)/music.o
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
