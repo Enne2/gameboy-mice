@@ -259,15 +259,54 @@ const uint16_t title_bass[16] = {
 };
 
 // ==========================================
-// VICTORY TRACK (16 ticks loop)
+// MACABRE VICTORY TRACK (64 ticks, 12 frames/tick)
 // ==========================================
-const uint16_t victory_mel[16] = {
-    M_C, M_E, M_G, M__, M_C6, M_G, M_E, M__,
-    M_F, M_A, M_C6, M__, M_E6, M_C6, M_G, M__
+const uint16_t vic_mel[64] = {
+    M_E, N_SUST, N_SUST, N_SUST,  N_DS5, N_SUST, N_SUST, N_SUST,
+    N_B4, N_SUST, N_SUST, N_SUST,  N_AS4, N_SUST, N_SUST, N_SUST,
+    N_G4, N_SUST, N_SUST, N_SUST,  N_FS4, N_SUST, N_SUST, N_SUST,
+    N_E4, N_SUST, N_SUST, N_SUST,  N_SUST, N_SUST, N_SUST, N_SUST,
+
+    M_E, N_SUST, N_SUST, N_SUST,  M_G, N_SUST, N_SUST, N_SUST,
+    N_DS5, N_SUST, N_SUST, N_SUST,  N_FS5, N_SUST, N_SUST, N_SUST,
+    N_B4, N_SUST, N_SUST, N_SUST,  N_AS4, N_SUST, N_SUST, N_SUST,
+    N_E4, N_SUST, N_SUST, N_SUST,  N_SUST, N_SUST, N_SUST, N_SUST
 };
-const uint16_t victory_bass[16] = {
-    B_C, B_E, B_G, B_E, B_C, B_E, B_G, B_E,
-    B_F, B_A, B_C5, B_A, B_C, B_G, B_C, B__
+
+const uint16_t vic_bass[64] = {
+    B_E, N_SUST, N_SUST, N_SUST, B_E, N_SUST, N_SUST, N_SUST,
+    N_DS4, N_SUST, N_SUST, N_SUST, N_DS4, N_SUST, N_SUST, N_SUST,
+    B_C, N_SUST, N_SUST, N_SUST, B_C, N_SUST, N_SUST, N_SUST,
+    B_E, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST,
+
+    B_E, N_SUST, N_SUST, N_SUST, B_E, N_SUST, N_SUST, N_SUST,
+    N_DS4, N_SUST, N_SUST, N_SUST, N_DS4, N_SUST, N_SUST, N_SUST,
+    B_C, N_SUST, N_SUST, N_SUST, B_B, N_SUST, N_SUST, N_SUST,
+    B_E, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST
+};
+
+const uint16_t vic_arp[64] = {
+    A_E, N_SUST, A_G, N_SUST, A_B, N_SUST, A_G, N_SUST,
+    A_DS4, N_SUST, A_FS4, N_SUST, N_AS4, N_SUST, A_FS4, N_SUST,
+    A_C, N_SUST, A_E, N_SUST, A_G, N_SUST, A_E, N_SUST,
+    A_E, N_SUST, A_G, N_SUST, A_B, N_SUST, A_G, N_SUST,
+
+    A_E, N_SUST, A_G, N_SUST, A_B, N_SUST, A_G, N_SUST,
+    A_DS4, N_SUST, A_FS4, N_SUST, N_AS4, N_SUST, A_FS4, N_SUST,
+    A_C, N_SUST, A_E, N_SUST, A_G, N_SUST, A_E, N_SUST,
+    A_E, N_REST, N_REST, N_REST, N_REST, N_REST, N_REST, N_REST
+};
+
+const uint8_t vic_drum[64] = {
+    1, 0, 0, 0, 1, 0, 0, 0,
+    1, 0, 0, 0, 1, 0, 0, 0,
+    1, 0, 0, 0, 1, 0, 0, 0,
+    1, 0, 0, 0, 1, 0, 0, 0,
+
+    1, 0, 0, 0, 1, 0, 0, 0,
+    1, 0, 0, 0, 1, 0, 0, 0,
+    1, 0, 0, 0, 1, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0, 0
 };
 
 static uint16_t tick = 0;
@@ -370,35 +409,51 @@ void update_music(void) {
             tick++;
             frame_counter = 8; // Veloce e allegro
         } else if (game_over_mode == 4) {
-            // VICTORY TRACK
-            if (tick >= 16) {
-                tick = 0; // LOOP
+            // MACABRE VICTORY TRACK
+            if (tick >= 64) {
+                game_over_mode = 2; // Fine
+                NR22_REG = 0x00; NR32_REG = 0x00; NR42_REG = 0x00; NR12_REG = 0x00;
+                return;
             }
             
-            uint16_t f2 = victory_mel[tick];
-            if (f2 == N_REST) {
-                NR22_REG = 0x00;
-            } else {
-                NR21_REG = 0x80; NR22_REG = 0xF2;
-                NR23_REG = (uint8_t)(f2 & 0xFF); NR24_REG = 0x80 | ((f2 >> 8) & 0x07);
+            uint16_t f1 = vic_arp[tick];
+            if (f1 != N_SUST) {
+                if (f1 == N_REST) {
+                    NR12_REG = 0x00;
+                } else {
+                    NR10_REG = 0x00; NR11_REG = 0x80; NR12_REG = 0x51;
+                    NR13_REG = (uint8_t)(f1 & 0xFF); NR14_REG = 0x80 | ((f1 >> 8) & 0x07);
+                }
             }
             
-            uint16_t f3 = victory_bass[tick];
-            if (f3 == N_REST) {
-                NR32_REG = 0x00;
-            } else {
-                NR32_REG = 0x20; 
-                NR33_REG = (uint8_t)(f3 & 0xFF); NR34_REG = 0x80 | ((f3 >> 8) & 0x07);
+            uint16_t f2 = vic_mel[tick];
+            if (f2 != N_SUST) {
+                if (f2 == N_REST) {
+                    NR22_REG = 0x00;
+                } else {
+                    NR21_REG = 0x80; NR22_REG = 0xF7;
+                    NR23_REG = (uint8_t)(f2 & 0xFF); NR24_REG = 0x80 | ((f2 >> 8) & 0x07);
+                }
             }
             
-            if (tick % 2 == 0) {
-                NR41_REG = 0x00; NR42_REG = 0x51; NR43_REG = 0x21; NR44_REG = 0x80;
-            } else {
-                NR42_REG = 0x00;
+            uint16_t f3 = vic_bass[tick];
+            if (f3 != N_SUST) {
+                if (f3 == N_REST) {
+                    NR32_REG = 0x00;
+                } else {
+                    NR32_REG = 0x20; 
+                    NR33_REG = (uint8_t)(f3 & 0xFF); NR34_REG = 0x80 | ((f3 >> 8) & 0x07);
+                }
+            }
+            
+            uint8_t d4 = vic_drum[tick];
+            if (d4 == 1) {
+                NR41_REG = 0x00; NR42_REG = 0xF2;
+                NR43_REG = 0x51; NR44_REG = 0x80;
             }
             
             tick++;
-            frame_counter = 6; // Molto veloce e festoso
+            frame_counter = 12; // Un po' più lento ma incalzante
         } else if (game_over_mode == 1) {
             // GAME OVER TRACKER (Tragico, 20 frames per tick)
             if (tick >= 64) {
