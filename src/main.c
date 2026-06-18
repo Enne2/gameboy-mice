@@ -54,13 +54,13 @@ void main(void) {
     initrand(DIV_REG);
     
     // Invia i dati grafici del gioco alla VRAM
-    set_bkg_data(0, 17, TileData); // 1 strada + 16 varianti autotile
+    set_bkg_data(0, 22, TileData); // 6 pavimenti + 16 varianti autotile
     
     // La mappa background in memoria hardware è grande 32x32 tiles.
-    // Inizializziamo il "fuori mappa" con siepi solide (mask 15 = 1 + 15)
+    // Inizializziamo il "fuori mappa" con siepi solide (mask 15 -> indice 21)
     for (y = 0; y < 32; y++) {
         for (x = 0; x < 32; x++) {
-            uint8_t solid_hedge = 16; 
+            uint8_t solid_hedge = 21; 
             set_bkg_tiles(x, y, 1, 1, &solid_hedge);
         }
     }
@@ -78,7 +78,13 @@ void main(void) {
                 if (x < MAZE_WIDTH-1 && maze[y][x+1] == 1) mask |= 4; // Est
                 if (y < MAZE_HEIGHT-1 && maze[y+1][x] == 1) mask |= 2; // Sud
                 if (x > 0 && maze[y][x-1] == 1) mask |= 1; // Ovest
-                tile_idx = 1 + mask;
+                tile_idx = 6 + mask; // Offset 6 per le siepi
+            } else {
+                // Scegli una variante casuale di pavimento per le stanze e i percorsi
+                // 0 è la base pulita, 1-5 sono crepe e detriti (rarità maggiore per la 0)
+                uint8_t r = rand() % 10;
+                if (r < 5) tile_idx = 0;
+                else tile_idx = 1 + (r % 5);
             }
             set_bkg_tiles(x, y, 1, 1, &tile_idx);
         }
