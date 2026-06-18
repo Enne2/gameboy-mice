@@ -143,6 +143,11 @@ void main(void) {
             while(1) {
                 update_music();
                 wait_vbl_done();
+                uint8_t keys = joypad();
+                if ((keys & J_START) && !(main_prev_keys & J_START)) {
+                    reset();
+                }
+                main_prev_keys = keys;
             }
         }
         
