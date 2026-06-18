@@ -98,7 +98,8 @@ void spawn_rat(uint8_t x, uint8_t y, uint8_t initial_dir) {
             
             rats[i].pixel_x = x * 8;
             rats[i].pixel_y = y * 8;
-            rats[i].reproduce_timer = 0;
+            // Il nuovo ratto resta fermo 1 secondo (60 frame) alla nascita usando lo stesso timer
+            rats[i].reproduce_timer = 60; 
             rats[i].cooldown_timer = 120; // Il cucciolo non si riproduce subito
             rats[i].is_mother = 0;
             play_sfx_plop(); // Suono di nascita!
