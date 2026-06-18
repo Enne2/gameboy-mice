@@ -154,6 +154,14 @@ void main(void) {
     while (1) {
         if (game_over_flag || victory_flag) {
             HIDE_SPRITES;
+            
+            // Nascondi tutti gli sprite (spostandoli fuori dallo schermo visibile)
+            // Questo spiega perché prima vedevi i topi fermi: lo schermo era
+            // cambiato, ma gli sprite erano rimasti nelle loro posizioni.
+            for (uint8_t i = 0; i < 40; i++) {
+                move_sprite(i, 0, 0);
+            }
+            
             move_bkg(0, 0); // Resetta lo scrolling hardware
             
             // Ripristina la palette normale (Nero=3, Bianco=0)
@@ -238,6 +246,11 @@ void main(void) {
         }
         
         uint8_t keys = joypad();
+        
+        // Debug cheat: forza vittoria con il tasto B
+        if ((keys & J_B) && !(main_prev_keys & J_B)) {
+            victory_flag = 1;
+        }
         
         // Controllo per la Pausa
         if ((keys & J_START) && !(main_prev_keys & J_START)) {

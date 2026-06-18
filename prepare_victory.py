@@ -30,20 +30,69 @@ palette_img[(np_img >= 64) & (np_img < 128)] = 2
 palette_img[(np_img >= 128) & (np_img < 192)] = 1
 palette_img[np_img >= 192] = 0
 
+# Draw VICTORY! text
+font = {
+    'V': ["#   #", "#   #", "#   #", "#   #", "#   #", " # # ", "  #  "],
+    'I': [" ### ", "  #  ", "  #  ", "  #  ", "  #  ", "  #  ", " ### "],
+    'C': [" ### ", "#   #", "#    ", "#    ", "#    ", "#   #", " ### "],
+    'T': ["#####", "  #  ", "  #  ", "  #  ", "  #  ", "  #  ", "  #  "],
+    'O': [" ### ", "#   #", "#   #", "#   #", "#   #", "#   #", " ### "],
+    'R': ["#### ", "#   #", "#   #", "#### ", "# #  ", "#  # ", "#   #"],
+    'Y': ["#   #", "#   #", " # # ", "  #  ", "  #  ", "  #  ", "  #  "],
+    '!': ["  #  ", "  #  ", "  #  ", "  #  ", "     ", "  #  ", "  #  "]
+}
+
+text_str = "VICTORY!"
+scale = 2
+char_w = 5 * scale
+char_h = 7 * scale
+spacing = 1 * scale
+start_x = (160 - len(text_str) * (char_w + spacing)) // 2
+start_y = 144 - char_h - 24  # A bit higher to leave room for the timer
+
+is_text_mask = np.zeros_like(palette_img, dtype=bool)
+
+box_pad = 2
+for y in range(start_y - box_pad, start_y + char_h + box_pad):
+    for x in range(start_x - box_pad, start_x + len(text_str) * (char_w + spacing) + box_pad):
+        if 0 <= y < 144 and 0 <= x < 160:
+            palette_img[y, x] = 3 # Black background
+            is_text_mask[y, x] = True
+
+for i, char in enumerate(text_str):
+    if char in font:
+        glyph = font[char]
+        for row in range(7):
+            for col in range(5):
+                if glyph[row][col] == '#':
+                    for sy in range(scale):
+                        for sx in range(scale):
+                            py = start_y + row * scale + sy
+                            px = start_x + i * (char_w + spacing) + col * scale + sx
+                            if 0 <= py < 144 and 0 <= px < 160:
+                                palette_img[py, px] = 0 # White text
+                                is_text_mask[py, px] = True
+
 tiles = []
+is_text_tile = []
 for y in range(0, 144, 8):
     for x in range(0, 160, 8):
         tile = palette_img[y:y+8, x:x+8]
         t_tuple = tuple(map(tuple, tile))
         tiles.append(t_tuple)
+        is_text_tile.append(np.any(is_text_mask[y:y+8, x:x+8]))
 
 unique_tiles = list(collections.OrderedDict.fromkeys(tiles))
 
 if len(unique_tiles) > 256:
     print("WARNING: More than 256 unique tiles! Reducing...")
+    text_unique = list(collections.OrderedDict.fromkeys([tiles[i] for i in range(len(tiles)) if is_text_tile[i]]))
     counts = collections.Counter(tiles)
-    most_common = [t for t, c in counts.most_common(256)]
-    reduced_unique = most_common
+    for t in text_unique:
+        if t in counts:
+            del counts[t]
+    most_common = [t for t, c in counts.most_common(256 - len(text_unique))]
+    reduced_unique = text_unique + most_common
     for i in range(len(tiles)):
         if tiles[i] not in reduced_unique:
             t_arr = np.array(tiles[i])
