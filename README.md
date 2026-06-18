@@ -53,4 +53,9 @@ Poiché il processore custom del Game Boy (SM83, simile allo Z80) lavora a soli 
 3. **Collisioni "Lazy" (Early-Exit Evaluation)**
    Piuttosto che testare le sovrapposizioni millimetriche (`pixel_x / pixel_y`) su O(N²) iterazioni (105 combinazioni) per frame, la logica confronta in *short-circuit* soltanto le coordinate grossolane in griglia (`rat_x != rat_y`). Se i topi non si trovano nemmeno sulla stessa mattonella, l'algoritmo ignora istantaneamente tutto il resto. Questa singola riga taglia l'80% delle istruzioni necessarie per i check di collisione.
    
+4. **DAS (Delayed Auto Shift) per l'Input**
+   Per rendere fluida la navigazione del cursore sulla griglia, è stata implementata una logica a stati temporizzati ereditata dai classici come Tetris. Invece di far scattare il cursore a ogni micro-pressione o farlo "scivolare" in modo incontrollabile, il codice legge l'input continuo (`joypad()`) e utilizza un timer a due fasi:
+   - *Initial Delay*: alla prima pressione lo spostamento è istantaneo, dopodiché la logica va in "pausa" per 12 frame (~0.2 secondi). Questo previene i doppi scatti accidentali.
+   - *Auto-Repeat Delay*: se il giocatore continua a tenere premuto oltre la soglia iniziale, la pausa tra un movimento e l'altro si accorcia a 6 frame, permettendo uno scorrimento automatico e fulmineo lungo l'intero labirinto.
+   
 Queste tecniche mostrano la filosofia del vero **retro-programming**, dove ogni ciclo di CPU conta.
