@@ -32,18 +32,39 @@ void init_cursor(void) {
 void update_cursor(void) {
     uint8_t keys = joypad();
     
-    // Movimento controllato dal D-PAD
-    if ((keys & J_UP) && !(previous_keys & J_UP)) {
-        if (cursor_y > 1) cursor_y--;
+    // Variabile statica per il timer dell'auto-repeat
+    static uint8_t cursor_timer = 0;
+    uint8_t moved = 0;
+    
+    // Controlla se le frecce direzionali sono premute
+    uint8_t dpad = keys & (J_UP | J_DOWN | J_LEFT | J_RIGHT);
+    
+    if (dpad) {
+        if (cursor_timer == 0) {
+            moved = 1;
+            // Se è la primissima pressione, ritardo maggiore (DAS). Altrimenti ritardo minore (repeat)
+            if (!(previous_keys & dpad)) {
+                cursor_timer = 12; // Initial delay
+            } else {
+                cursor_timer = 6;  // Repeat delay (il moltiplicatore di velocità)
+            }
+        } else {
+            cursor_timer--;
+        }
+    } else {
+        cursor_timer = 0; // Azzera il timer se si rilasciano le frecce
     }
-    if ((keys & J_DOWN) && !(previous_keys & J_DOWN)) {
-        if (cursor_y < MAZE_HEIGHT - 2) cursor_y++;
-    }
-    if ((keys & J_LEFT) && !(previous_keys & J_LEFT)) {
-        if (cursor_x > 1) cursor_x--;
-    }
-    if ((keys & J_RIGHT) && !(previous_keys & J_RIGHT)) {
-        if (cursor_x < MAZE_WIDTH - 2) cursor_x++;
+    
+    if (moved) {
+        if (keys & J_UP) {
+            if (cursor_y > 1) cursor_y--;
+        } else if (keys & J_DOWN) {
+            if (cursor_y < MAZE_HEIGHT - 2) cursor_y++;
+        } else if (keys & J_LEFT) {
+            if (cursor_x > 1) cursor_x--;
+        } else if (keys & J_RIGHT) {
+            if (cursor_x < MAZE_WIDTH - 2) cursor_x++;
+        }
     }
     
     // Tasto A per sganciare la bomba
