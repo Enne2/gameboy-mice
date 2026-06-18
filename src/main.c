@@ -59,10 +59,14 @@ void main(void) {
     // Invia i dati grafici del gioco alla VRAM
     set_bkg_data(0, 22, TileData); // 6 pavimenti + 16 varianti autotile
     
-    // Inizializza la grafica della PAUSA sulla Window
-    set_bkg_data(22, 7, PauseTiles); // 7 tile per la pausa (P,A,U,S,E, blank, border)
-    set_win_tiles(0, 0, 7, 3, PauseMap);
-    move_win(7 + 52, 60); // Centra il dialog 7x3 (160-56)/2 = 52. (144-24)/2 = 60.
+    // Inizializza la grafica della PAUSA come Sprite
+    set_sprite_data(11, 5, PauseTiles); // 5 tile per la pausa (P,A,U,S,E)
+    // Nascondi gli sprite del menu pausa all'avvio
+    move_sprite(20, 0, 0);
+    move_sprite(21, 0, 0);
+    move_sprite(22, 0, 0);
+    move_sprite(23, 0, 0);
+    move_sprite(24, 0, 0);
     
     // La mappa background in memoria hardware è grande 32x32 tiles.
     // Inizializziamo il "fuori mappa" con siepi solide (mask 15 -> indice 21)
@@ -144,7 +148,18 @@ void main(void) {
         
         // Controllo per la Pausa
         if ((keys & J_START) && !(main_prev_keys & J_START)) {
-            SHOW_WIN;
+            // Mostra la scritta PAUSE al centro dello schermo usando gli sprite
+            set_sprite_tile(20, 11);
+            set_sprite_tile(21, 12);
+            set_sprite_tile(22, 13);
+            set_sprite_tile(23, 14);
+            set_sprite_tile(24, 15);
+            move_sprite(20, 68, 88);
+            move_sprite(21, 76, 88);
+            move_sprite(22, 84, 88);
+            move_sprite(23, 92, 88);
+            move_sprite(24, 100, 88);
+            
             waitpadup(); // Aspetta che START sia rilasciato
             
             while (1) {
@@ -156,7 +171,13 @@ void main(void) {
                 wait_vbl_done();
             }
             
-            HIDE_WIN;
+            // Nascondi gli sprite
+            move_sprite(20, 0, 0);
+            move_sprite(21, 0, 0);
+            move_sprite(22, 0, 0);
+            move_sprite(23, 0, 0);
+            move_sprite(24, 0, 0);
+            
             waitpadup(); // Aspetta il rilascio
             keys = joypad(); // Rileggi per evitare salti
         }
