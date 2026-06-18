@@ -1,54 +1,18 @@
 #include <gb/gb.h>
 #include "mockup_gfx.h"
 
-// ID dei tile in base all'ordine nel dizionario python:
-// 0: floor
-// 1: hedge
-// 2: hedge_top
-// 3: frame_tl
-// 4: frame_tr
-// 5: frame_bl
-// 6: frame_br
-// 7: frame_t
-// 8: frame_b
-// 9: frame_l
-// 10: frame_r
-
-const uint8_t level_map[18][20] = {
-    {3, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,10},
-    {9, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0,10},
-    {9, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0,10},
-    {9, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0,10},
-    {9, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0,10},
-    {9, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0,10},
-    {9, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0,10},
-    {9, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0,10},
-    {9, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,10},
-    {9, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,10},
-    {9, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,10},
-    {9, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0,10},
-    {9, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0,10},
-    {9, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0,10},
-    {9, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,10},
-    {9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,10},
-    {5, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 6}
-};
-
 void main(void) {
     DISPLAY_OFF;
     
     // Palette GBDK standard
     BGP_REG = 0b11100100;
     
-    set_bkg_data(0, 11, MockupTileData);
+    // Non sappiamo quanti tile ci sono, ma sono <= 256. Lo script genera la dimensione esatta.
+    // Usiamo 256 per coprire tutti i tile
+    set_bkg_data(0, 256, MockupTileData);
     
-    for (uint8_t y = 0; y < 18; y++) {
-        for (uint8_t x = 0; x < 20; x++) {
-            uint8_t t = level_map[y][x];
-            set_bkg_tiles(x, y, 1, 1, &t);
-        }
-    }
+    // Scriviamo direttamente l'intera mappa 20x18
+    set_bkg_tiles(0, 0, 20, 18, MockupMapData);
     
     SHOW_BKG;
     DISPLAY_ON;
