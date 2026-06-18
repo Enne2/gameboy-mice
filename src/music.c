@@ -43,6 +43,7 @@
 #define A_G N_G4
 #define A_GS N_GS4
 #define A_A N_A4
+#define A_AS N_AS4
 #define A_B N_B4
 #define A_D N_D4
 #define A_C5 N_C5
@@ -88,9 +89,11 @@ const uint16_t* const arp_parts[4] = { trk_arp_0, trk_arp_1, trk_arp_2, trk_arp_
 #define M_G N_G5
 #define M_GS N_GS5
 #define M_A N_A5
+#define M_AS N_AS5
 #define M_B N_B5
 #define M_C6 N_C6
 #define M_D6 N_D6
+#define M_DS N_DS5
 #define M_E6 N_E6
 #define M__ N_REST
 
@@ -130,6 +133,7 @@ const uint16_t* const mel_parts[4] = { trk_mel_0, trk_mel_1, trk_mel_2, trk_mel_
 #define B_G N_G4
 #define B_GS N_GS4
 #define B_A N_A4
+#define B_AS N_AS4
 #define B_B N_B4
 #define B_C5 N_C5
 #define B_E5 N_E5
@@ -259,53 +263,53 @@ const uint16_t title_bass[16] = {
 };
 
 // ==========================================
-// MACABRE VICTORY TRACK (64 ticks, 12 frames/tick)
+// MACABRE VICTORY FANFARE (64 ticks, 8 frames/tick)
 // ==========================================
 const uint16_t vic_mel[64] = {
-    M_E, N_SUST, N_SUST, N_SUST,  N_DS5, N_SUST, N_SUST, N_SUST,
-    N_B4, N_SUST, N_SUST, N_SUST,  N_AS4, N_SUST, N_SUST, N_SUST,
-    N_G4, N_SUST, N_SUST, N_SUST,  N_FS4, N_SUST, N_SUST, N_SUST,
-    N_E4, N_SUST, N_SUST, N_SUST,  N_SUST, N_SUST, N_SUST, N_SUST,
+    M_C, N_REST, M_C, N_REST, M_C, N_REST, M_C, N_SUST,
+    N_GS4, N_SUST, N_SUST, N_SUST, N_AS4, N_SUST, N_SUST, N_SUST,
+    M_C, N_SUST, N_SUST, N_SUST, N_AS4, N_REST, M_C, N_SUST,
+    N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST,
 
-    M_E, N_SUST, N_SUST, N_SUST,  M_G, N_SUST, N_SUST, N_SUST,
-    N_DS5, N_SUST, N_SUST, N_SUST,  N_FS5, N_SUST, N_SUST, N_SUST,
-    N_B4, N_SUST, N_SUST, N_SUST,  N_AS4, N_SUST, N_SUST, N_SUST,
-    N_E4, N_SUST, N_SUST, N_SUST,  N_SUST, N_SUST, N_SUST, N_SUST
+    M_C, N_REST, M_C, N_REST, M_C, N_REST, M_C, N_SUST,
+    N_GS4, N_SUST, N_SUST, N_SUST, N_AS4, N_SUST, N_SUST, N_SUST,
+    M_C, N_SUST, N_SUST, N_SUST, M_DS, N_REST, M_C, N_SUST,
+    N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST
 };
 
 const uint16_t vic_bass[64] = {
-    B_E, N_SUST, N_SUST, N_SUST, B_E, N_SUST, N_SUST, N_SUST,
-    N_DS4, N_SUST, N_SUST, N_SUST, N_DS4, N_SUST, N_SUST, N_SUST,
-    B_C, N_SUST, N_SUST, N_SUST, B_C, N_SUST, N_SUST, N_SUST,
-    B_E, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST,
+    B_C, N_REST, B_C, N_REST, B_C, N_REST, B_C, N_REST,
+    B_GS, N_REST, B_GS, N_REST, B_AS, N_REST, B_AS, N_REST,
+    B_C, N_REST, B_C, N_REST, B_C, N_REST, B_C, N_REST,
+    B_C, N_REST, B_C, N_REST, B_C, N_REST, B_C, N_REST,
 
-    B_E, N_SUST, N_SUST, N_SUST, B_E, N_SUST, N_SUST, N_SUST,
-    N_DS4, N_SUST, N_SUST, N_SUST, N_DS4, N_SUST, N_SUST, N_SUST,
-    B_C, N_SUST, N_SUST, N_SUST, B_B, N_SUST, N_SUST, N_SUST,
-    B_E, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST, N_SUST
+    B_C, N_REST, B_C, N_REST, B_C, N_REST, B_C, N_REST,
+    B_GS, N_REST, B_GS, N_REST, B_AS, N_REST, B_AS, N_REST,
+    B_C, N_REST, B_C, N_REST, B_C, N_REST, B_C, N_REST,
+    B_C, N_REST, B_C, N_REST, B_C, N_REST, B_C, N_REST
 };
 
 const uint16_t vic_arp[64] = {
-    A_E, N_SUST, A_G, N_SUST, A_B, N_SUST, A_G, N_SUST,
-    A_DS4, N_SUST, A_FS4, N_SUST, N_AS4, N_SUST, A_FS4, N_SUST,
-    A_C, N_SUST, A_E, N_SUST, A_G, N_SUST, A_E, N_SUST,
-    A_E, N_SUST, A_G, N_SUST, A_B, N_SUST, A_G, N_SUST,
-
-    A_E, N_SUST, A_G, N_SUST, A_B, N_SUST, A_G, N_SUST,
-    A_DS4, N_SUST, A_FS4, N_SUST, N_AS4, N_SUST, A_FS4, N_SUST,
-    A_C, N_SUST, A_E, N_SUST, A_G, N_SUST, A_E, N_SUST,
-    A_E, N_REST, N_REST, N_REST, N_REST, N_REST, N_REST, N_REST
+    A_C, N_SUST, A_DS4, N_SUST, A_G, N_SUST, A_C5, N_SUST,
+    A_GS, N_SUST, A_C, N_SUST, A_AS, N_SUST, A_D4, N_SUST,
+    A_C, N_SUST, A_DS4, N_SUST, A_G, N_SUST, A_C5, N_SUST,
+    A_C, N_SUST, A_DS4, N_SUST, A_G, N_SUST, A_C5, N_SUST,
+    
+    A_C, N_SUST, A_DS4, N_SUST, A_G, N_SUST, A_C5, N_SUST,
+    A_GS, N_SUST, A_C, N_SUST, A_AS, N_SUST, A_D4, N_SUST,
+    A_C, N_SUST, A_DS4, N_SUST, A_G, N_SUST, A_C5, N_SUST,
+    A_C, N_REST, N_REST, N_REST, N_REST, N_REST, N_REST, N_REST
 };
 
 const uint8_t vic_drum[64] = {
-    1, 0, 0, 0, 1, 0, 0, 0,
-    1, 0, 0, 0, 1, 0, 0, 0,
-    1, 0, 0, 0, 1, 0, 0, 0,
-    1, 0, 0, 0, 1, 0, 0, 0,
+    1, 0, 1, 0, 1, 0, 1, 0,
+    1, 0, 1, 0, 1, 0, 1, 0,
+    1, 2, 1, 2, 1, 2, 1, 2,
+    1, 0, 2, 0, 1, 0, 2, 0,
 
-    1, 0, 0, 0, 1, 0, 0, 0,
-    1, 0, 0, 0, 1, 0, 0, 0,
-    1, 0, 0, 0, 1, 0, 0, 0,
+    1, 0, 1, 0, 1, 0, 1, 0,
+    1, 0, 1, 0, 1, 0, 1, 0,
+    1, 2, 1, 2, 1, 2, 1, 2,
     1, 0, 0, 0, 0, 0, 0, 0
 };
 
@@ -453,7 +457,7 @@ void update_music(void) {
             }
             
             tick++;
-            frame_counter = 12; // Un po' più lento ma incalzante
+            frame_counter = 8; // Più veloce e marziale
         } else if (game_over_mode == 1) {
             // GAME OVER TRACKER (Tragico, 20 frames per tick)
             if (tick >= 64) {
