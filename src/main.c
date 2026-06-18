@@ -44,7 +44,9 @@ void main(void) {
     OBP1_REG = 0b11000000; // Pausa (3=Nero, 2=Bianco, 1=Bianco, 0=Trasparente)
     
     // Attendi la pressione di START
+    play_title_music();
     while (1) {
+        update_music();
         if (joypad() & J_START) {
             break;
         }

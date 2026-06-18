@@ -246,6 +246,18 @@ const uint8_t go_drum[64] = {
     1, 0, 0, 0,  0, 0, 0, 0
 };
 
+// ==========================================
+// TITLE TRACK (16 ticks loop)
+// ==========================================
+const uint16_t title_mel[16] = {
+    M_C, M__, M_E, M__, M_G, M__, M_C6, M__,
+    M_A, M__, M_G, M__, M_E, M_D, M_C, M__
+};
+const uint16_t title_bass[16] = {
+    B_C, B_C, B_E, B_E, B_G, B_G, B_C5, B_C5,
+    B_F, B_F, B_E, B_E, B_C, B_G, B_C, B__
+};
+
 static uint16_t tick = 0;
 static uint8_t frame_counter = 0;
 static uint8_t sfx_timer = 0;
@@ -312,7 +324,40 @@ void update_music(void) {
     if (sfx_timer > 0) sfx_timer--;
     
     if (frame_counter == 0) {
-        if (game_over_mode == 1) {
+        if (game_over_mode == 3) {
+            // TITLE SCREEN JINGLE (Allegro)
+            if (tick >= 16) {
+                tick = 0; // LOOP
+            }
+            
+            uint16_t f2 = title_mel[tick];
+            if (f2 == N_REST) {
+                NR22_REG = 0x00;
+            } else {
+                NR21_REG = 0x80; NR22_REG = 0xF2;
+                NR23_REG = (uint8_t)(f2 & 0xFF); NR24_REG = 0x80 | ((f2 >> 8) & 0x07);
+            }
+            
+            uint16_t f3 = title_bass[tick];
+            if (f3 == N_REST) {
+                NR32_REG = 0x00;
+            } else {
+                NR32_REG = 0x20; 
+                NR33_REG = (uint8_t)(f3 & 0xFF); NR34_REG = 0x80 | ((f3 >> 8) & 0x07);
+            }
+            
+            // Un po' di drum
+            if (tick % 4 == 0) {
+                NR41_REG = 0x00; NR42_REG = 0xF1; NR43_REG = 0x11; NR44_REG = 0x80;
+            } else if (tick % 2 == 0) {
+                NR41_REG = 0x00; NR42_REG = 0x51; NR43_REG = 0x21; NR44_REG = 0x80;
+            } else {
+                NR42_REG = 0x00;
+            }
+            
+            tick++;
+            frame_counter = 8; // Veloce e allegro
+        } else if (game_over_mode == 1) {
             // GAME OVER TRACKER (Tragico, 20 frames per tick)
             if (tick >= 64) {
                 game_over_mode = 2; // Fine
@@ -456,4 +501,26 @@ void play_sfx_bomb_drop(void) {
     NR43_REG = 0x22; // Frequenza alta, noise
     NR44_REG = 0xC0; // Trigger
     sfx_timer = 15; // Proteggi per la durata del suono
+}
+
+void play_title_music(void) {
+    // Reset e attivazione master sound
+    NR52_REG = 0x00;
+    NR52_REG = 0x80;
+    NR50_REG = 0x77;
+    NR51_REG = 0xFF;
+    
+    // Inizializza CH3 Wave RAM
+    NR30_REG = 0x00;
+    volatile uint8_t *wave_ptr = (volatile uint8_t *)0xFF30;
+    for (uint8_t i = 0; i < 16; i++) {
+        wave_ptr[i] = wave_ram[i];
+    }
+    NR30_REG = 0x80;
+    
+    game_over_mode = 3;
+    tick = 0;
+    frame_counter = 0;
+    
+    NR12_REG = 0; NR22_REG = 0; NR32_REG = 0; NR42_REG = 0;
 }
