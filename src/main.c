@@ -21,6 +21,9 @@
 #include "music.h"
 #include "cursor.h"
 #include "bomb.h"
+#include "pause_gfx.h"
+
+static uint8_t main_prev_keys = 0;
 
 void main(void) {
     uint8_t y, x;
@@ -55,6 +58,11 @@ void main(void) {
     
     // Invia i dati grafici del gioco alla VRAM
     set_bkg_data(0, 22, TileData); // 6 pavimenti + 16 varianti autotile
+    
+    // Inizializza la grafica della PAUSA sulla Window
+    set_bkg_data(22, 7, PauseTiles); // 7 tile per la pausa (P,A,U,S,E, blank, border)
+    set_win_tiles(0, 0, 7, 3, PauseMap);
+    move_win(7 + 52, 60); // Centra il dialog 7x3 (160-56)/2 = 52. (144-24)/2 = 60.
     
     // La mappa background in memoria hardware è grande 32x32 tiles.
     // Inizializziamo il "fuori mappa" con siepi solide (mask 15 -> indice 21)
@@ -131,6 +139,28 @@ void main(void) {
                 wait_vbl_done();
             }
         }
+        
+        uint8_t keys = joypad();
+        
+        // Controllo per la Pausa
+        if ((keys & J_START) && !(main_prev_keys & J_START)) {
+            SHOW_WIN;
+            waitpadup(); // Aspetta che START sia rilasciato
+            
+            while (1) {
+                uint8_t p_keys = joypad();
+                if (p_keys & J_START) {
+                    break; // Esci dalla pausa
+                }
+                update_music(); // La musica continua in pausa
+                wait_vbl_done();
+            }
+            
+            HIDE_WIN;
+            waitpadup(); // Aspetta il rilascio
+            keys = joypad(); // Rileggi per evitare salti
+        }
+        main_prev_keys = keys;
         
         // Aggiorna la musica in background
         update_music();
