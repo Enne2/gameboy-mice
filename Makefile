@@ -9,14 +9,18 @@ OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 
 TARGET = maze.gb
 AUDIO_TARGET = test_audio.gb
+MOCKUP_TARGET = test_mockup.gb
 
-all: $(TARGET) $(AUDIO_TARGET)
+all: $(TARGET) $(AUDIO_TARGET) $(MOCKUP_TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
 
 $(AUDIO_TARGET): test_audio.c $(OBJ_DIR)/music.o
 	$(CC) $(CFLAGS) -o $(AUDIO_TARGET) test_audio.c $(OBJ_DIR)/music.o
+
+$(MOCKUP_TARGET): test_mockup.c src/mockup_gfx.c
+	$(CC) $(CFLAGS) -o $(MOCKUP_TARGET) test_mockup.c src/mockup_gfx.c
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
