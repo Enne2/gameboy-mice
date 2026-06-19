@@ -587,13 +587,3 @@ void play_victory_music(void) {
     
     NR12_REG = 0; NR22_REG = 0; NR32_REG = 0; NR42_REG = 0;
 }
-        wave_ptr[i] = wave_ram[i];
-    }
-    NR30_REG = 0x80;
-    
-    game_over_mode = 4; // Victory mode
-    tick = 0;
-    frame_counter = 0;
-    
-    NR12_REG = 0; NR22_REG = 0; NR32_REG = 0; NR42_REG = 0;
-}

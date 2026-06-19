@@ -88,17 +88,3 @@ void update_cursor(void) {
         move_sprite(39, cursor_x * 8 + 12, cursor_y * 8 + 20);
     }
 }
-        toggle_music();
-    }
-    
-    previous_keys = keys;
-    
-    // Effetto lampeggiante: nascondi il cursore per metà del ciclo (ogni 16 frame)
-    blink++;
-    if (blink & 0x10) {
-        move_sprite(39, 0, 0); // Nascondi spostandolo fuori schermo
-    } else {
-        // Posiziona il cursore calcolando offset (12, 20) per centrarlo sulla griglia 8x8
-        move_sprite(39, cursor_x * 8 + 12, cursor_y * 8 + 20);
-    }
-}

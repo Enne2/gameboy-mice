@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mice! (WebAssembly GameBoy)</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        body {
+            background-color: #121212;
+            color: #eee;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        canvas {
+            background-color: #000;
+            image-rendering: pixelated;
+            width: 320px;
+            height: 288px;
+            border: 5px solid #444;
+            border-radius: 5px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+        .controls {
+            margin-top: 20px;
+            background: #222;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .key {
+            background: #444;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        
+        /* Controlli Mobile */
+        #mobile-controls {
+            display: none;
+            margin-top: 20px;
+            gap: 20px;
+        }
+        @media (max-width: 600px) {
+            #mobile-controls {
+                display: flex;
+            }
+            .controls {
+                display: none; /* Nasconde istruzioni testuali su mobile */
+            }
+        }
+        .btn {
+            background: #555;
+            color: white;
+            border: none;
+            font-weight: bold;
+            font-size: 16px;
+            touch-action: manipulation;
+            user-select: none;
+        }
+        .dpad {
+            display: grid;
+            grid-template-columns: 50px 50px 50px;
+            grid-template-rows: 50px 50px 50px;
+            gap: 5px;
+        }
+        .dpad .btn { border-radius: 8px; }
+        .d-up { grid-column: 2; grid-row: 1; }
+        .d-left { grid-column: 1; grid-row: 2; }
+        .d-right { grid-column: 3; grid-row: 2; }
+        .d-down { grid-column: 2; grid-row: 3; }
+        
+        .action-btns {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .btn-round {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .btn-pill {
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .start-select {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        /* Fullscreen Container & Button */
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        #game-container:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            background-color: #121212;
+            padding: 20px;
+            box-sizing: border-box;
+            gap: 20px;
+        }
+        #game-container:fullscreen canvas {
+            width: 80vmin;
+            height: 72vmin;
+            max-width: 100%;
+            max-height: 75vh;
+            border-color: #666;
+        }
+        .btn-fs {
+            margin-top: 15px;
+            background: #2a2a2a;
+            color: #eee;
+            border: 1px solid #444;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .btn-fs:hover {
+            background: #3a3a3a;
+            border-color: #666;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Mice!</h1>
+    
+    <div id="game-container">
+        <canvas id="gameboy"></canvas>
+        
+        <button class="btn-fs" id="btn-fullscreen">
+            Schermo Intero ⛶
+        </button>
+
+        <!-- Controlli Mobile a Schermo (dentro il container per mantenerli visibili in fullscreen) -->
+        <div id="mobile-controls">
+            <div class="dpad">
+                <button class="btn d-up" id="btn-up">U</button>
+                <button class="btn d-left" id="btn-left">L</button>
+                <button class="btn d-right" id="btn-right">R</button>
+                <button class="btn d-down" id="btn-down">D</button>
+            </div>
+            <div class="start-select">
+                <button class="btn btn-pill" id="btn-select">SELECT</button>
+                <button class="btn btn-pill" id="btn-start">START</button>
+            </div>
+            <div class="action-btns">
+                <button class="btn btn-round" id="btn-b">B</button>
+                <button class="btn btn-round" id="btn-a">A</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls" id="keyboard-controls">
+        <strong>Comandi Tastiera:</strong><br><br>
+        <span class="key">Frecce</span> Muovi Cursore<br>
+        <span class="key">A</span> Bottone A (Conferma)<br>
+        <span class="key">S</span> Bottone B (Spara)<br>
+        <span class="key">Invio</span> Start<br>
+        <span class="key">Backspace</span> Select
+    </div>
+
+    <!-- WasmBoy: emulatore Game Boy in WebAssembly -->
+    <script src="wasmboy.wasm.iife.js"></script>
+    <script>
+        const canvas = document.getElementById('gameboy');
+        // Il bundle IIFE espone la libreria sotto WasmBoy.WasmBoy
+        const wasmBoyObj = WasmBoy.WasmBoy || WasmBoy;
+
+        // WasmBoy v0.7 API: setCanvas → loadROM → play
+        wasmBoyObj.setCanvas(canvas);
+
+        fetch('mice.gb')
+            .then(res => res.arrayBuffer())
+            .then(romBuffer => {
+                console.log("ROM caricata, avvio emulatore...");
+                return wasmBoyObj.loadROM(new Uint8Array(romBuffer));
+            })
+            .then(() => {
+                console.log("Avvio...");
+                return wasmBoyObj.play();
+            })
+            .catch(err => {
+                console.error("Errore:", err);
+            });
+
+        // WasmBoy usa Z=A, X=B, Enter=Start, Space=Select. 
+        // Mappiamo i tasti richiesti per forzare l'evento corretto.
+        const keyMap = {
+            'a': { key: 'z', code: 'KeyZ' },
+            'A': { key: 'z', code: 'KeyZ' },
+            's': { key: 'x', code: 'KeyX' },
+            'S': { key: 'x', code: 'KeyX' },
+            'Backspace': { key: ' ', code: 'Space' }
+        };
+
+        const simulateKeyEvent = (type, keyDef) => {
+            let ev;
+            try {
+                ev = new KeyboardEvent(type, { key: keyDef.key, code: keyDef.code, bubbles: true, cancelable: true });
+            } catch (e) {
+                // Fallback for older browsers
+                ev = document.createEvent('KeyboardEvent');
+                ev.initKeyboardEvent(type, true, true, window, keyDef.key, 0, false, false, false, false);
+            }
+            document.dispatchEvent(ev);
+        };
+
+        window.addEventListener('keydown', (e) => {
+            if (keyMap[e.key]) {
+                e.preventDefault();
+                simulateKeyEvent('keydown', keyMap[e.key]);
+            }
+        });
+        window.addEventListener('keyup', (e) => {
+            if (keyMap[e.key]) {
+                e.preventDefault();
+                simulateKeyEvent('keyup', keyMap[e.key]);
+            }
+        });
+
+        // Binding dei bottoni su schermo (Touch / Mouse)
+        const bindButton = (id, keyDef) => {
+            const btn = document.getElementById(id);
+            const trigger = (type) => (e) => {
+                e.preventDefault();
+                simulateKeyEvent(type, keyDef);
+            };
+            btn.addEventListener('touchstart', trigger('keydown'), { passive: false });
+            btn.addEventListener('touchend', trigger('keyup'), { passive: false });
+            btn.addEventListener('mousedown', trigger('keydown'));
+            btn.addEventListener('mouseup', trigger('keyup'));
+            btn.addEventListener('mouseleave', trigger('keyup'));
+        };
+
+        bindButton('btn-up', { key: 'ArrowUp', code: 'ArrowUp' });
+        bindButton('btn-down', { key: 'ArrowDown', code: 'ArrowDown' });
+        bindButton('btn-left', { key: 'ArrowLeft', code: 'ArrowLeft' });
+        bindButton('btn-right', { key: 'ArrowRight', code: 'ArrowRight' });
+        bindButton('btn-a', { key: 'z', code: 'KeyZ' }); 
+        bindButton('btn-b', { key: 'x', code: 'KeyX' }); 
+        bindButton('btn-start', { key: 'Enter', code: 'Enter' });
+        bindButton('btn-select', { key: ' ', code: 'Space' });
+
+        // Gestione Fullscreen
+        const gameContainer = document.getElementById('game-container');
+        const fsButton = document.getElementById('btn-fullscreen');
+
+        fsButton.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                gameContainer.requestFullscreen().then(() => {
+                    fsButton.innerHTML = 'Esci Fullscreen ⛶';
+                }).catch(err => {
+                    console.error(`Errore fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen().then(() => {
+                    fsButton.innerHTML = 'Schermo Intero ⛶';
+                });
+            }
+        });
+
+        // Ascolta il cambio di fullscreen esterno (tasto ESC, etc.) per aggiornare il testo del bottone
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fsButton.innerHTML = 'Schermo Intero ⛶';
+            } else {
+                fsButton.innerHTML = 'Esci Fullscreen ⛶';
+            }
+        });
+    </script>
+</body>
+</html>

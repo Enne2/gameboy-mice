@@ -107,16 +107,3 @@ void update_bombs(void) {
         }
     }
 }
-                    move_sprite(sp, (xx * 8) + 12, py);
-                }
-                do_explosion_damage(xx, bomb.y);
-            }
-        }
-    } else if (bomb.state == BOMB_STATE_EXPLODING) {
-        bomb.timer--;
-        if (bomb.timer == 0) {
-            bomb.state = BOMB_STATE_INACTIVE;
-            hide_explosion();
-        }
-    }
-}
