@@ -176,8 +176,8 @@
     <div class="controls" id="keyboard-controls">
         <strong>Comandi Tastiera:</strong><br><br>
         <span class="key">Frecce</span> Muovi Cursore<br>
-        <span class="key">A</span> Bottone A (Conferma)<br>
-        <span class="key">S</span> Bottone B (Spara)<br>
+        <span class="key">Ctrl Sinistro</span> Bottone A (Conferma)<br>
+        <span class="key">Alt Sinistro</span> Bottone B (Spara)<br>
         <span class="key">Invio</span> Start<br>
         <span class="key">Backspace</span> Select
     </div>
@@ -207,12 +207,10 @@
             });
 
         // WasmBoy usa Z=A, X=B, Enter=Start, Space=Select. 
-        // Mappiamo i tasti richiesti per forzare l'evento corretto.
+        // Mappiamo i tasti richiesti (Ctrl/Alt sinistri) per forzare l'evento corretto.
         const keyMap = {
-            'a': { key: 'z', code: 'KeyZ' },
-            'A': { key: 'z', code: 'KeyZ' },
-            's': { key: 'x', code: 'KeyX' },
-            'S': { key: 'x', code: 'KeyX' },
+            'ControlLeft': { key: 'z', code: 'KeyZ' },
+            'AltLeft': { key: 'x', code: 'KeyX' },
             'Backspace': { key: ' ', code: 'Space' }
         };
 
@@ -229,15 +227,15 @@
         };
 
         window.addEventListener('keydown', (e) => {
-            if (keyMap[e.key]) {
+            if (keyMap[e.code]) {
                 e.preventDefault();
-                simulateKeyEvent('keydown', keyMap[e.key]);
+                simulateKeyEvent('keydown', keyMap[e.code]);
             }
         });
         window.addEventListener('keyup', (e) => {
-            if (keyMap[e.key]) {
+            if (keyMap[e.code]) {
                 e.preventDefault();
-                simulateKeyEvent('keyup', keyMap[e.key]);
+                simulateKeyEvent('keyup', keyMap[e.code]);
             }
         });
 
