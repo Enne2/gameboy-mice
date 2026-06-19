@@ -1,0 +1,713 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler
+                                      3 ; Version 4.5.1 #15267 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module bomb
+                                      6 	
+                                      7 ;--------------------------------------------------------
+                                      8 ; Public variables in this module
+                                      9 ;--------------------------------------------------------
+                                     10 	.globl _set_sprite_data
+                                     11 	.globl _play_sfx_bomb_drop
+                                     12 	.globl _play_sfx_explosion
+                                     13 	.globl _kill_rats_at
+                                     14 	.globl _init_bombs
+                                     15 	.globl _drop_bomb
+                                     16 	.globl _update_bombs
+                                     17 ;--------------------------------------------------------
+                                     18 ; special function registers
+                                     19 ;--------------------------------------------------------
+                                     20 	.area _HRAM
+                                     21 ;--------------------------------------------------------
+                                     22 ; ram data
+                                     23 ;--------------------------------------------------------
+                                     24 	.area _DATA
+    00000000                         25 _bomb:
+    00000000                         26 	.ds 5
+                                     27 ;--------------------------------------------------------
+                                     28 ; ram data
+                                     29 ;--------------------------------------------------------
+                                     30 	.area _INITIALIZED
+                                     31 ;--------------------------------------------------------
+                                     32 ; absolute external ram data
+                                     33 ;--------------------------------------------------------
+                                     34 	.area _DABS (ABS)
+                                     35 ;--------------------------------------------------------
+                                     36 ; global & static initialisations
+                                     37 ;--------------------------------------------------------
+                                     38 	.area _HOME
+                                     39 	.area _GSINIT
+                                     40 	.area _GSFINAL
+                                     41 	.area _GSINIT
+                                     42 ;--------------------------------------------------------
+                                     43 ; Home
+                                     44 ;--------------------------------------------------------
+                                     45 	.area _HOME
+                                     46 	.area _HOME
+                                     47 ;--------------------------------------------------------
+                                     48 ; code
+                                     49 ;--------------------------------------------------------
+                                     50 	.area _CODE
+                                     51 ;src/bomb.c:27: void init_bombs(void) {
+                                     52 ;	---------------------------------
+                                     53 ; Function init_bombs
+                                     54 ; ---------------------------------
+    00000000                         55 _init_bombs::
+                                     56 ;src/bomb.c:28: bomb.state = BOMB_STATE_INACTIVE;
+    00000000 21r00r00         [12]   57 	ld	hl, #_bomb
+    00000003 36 00            [12]   58 	ld	(hl), #0x00
+                                     59 ;src/bomb.c:29: set_sprite_data(5, 6, BombSpriteData);
+    00000005 11r00r00         [12]   60 	ld	de, #_BombSpriteData
+    00000008 D5               [16]   61 	push	de
+    00000009 21 05 06         [12]   62 	ld	hl, #0x605
+    0000000C E5               [16]   63 	push	hl
+    0000000D CDr00r00         [24]   64 	call	_set_sprite_data
+    00000010 E8 04            [16]   65 	add	sp, #4
+                                     66 ;/home/enne2/.local/gbdk/include/gb/gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    00000012 21r98r00         [12]   67 	ld	hl, #(_shadow_OAM + 152)
+                                     68 ;/home/enne2/.local/gbdk/include/gb/gb.h:1974: itm->y=y, itm->x=x;
+    00000015 AF               [ 4]   69 	xor	a, a
+    00000016 22               [ 8]   70 	ld	(hl+), a
+    00000017 77               [ 8]   71 	ld	(hl), a
+                                     72 ;src/bomb.c:31: for(uint8_t i = 0; i < EXP_POOL_SIZE; i++) {
+    00000018 0E 00            [ 8]   73 	ld	c, #0x00
+    0000001A                         74 00105$:
+    0000001A 79               [ 4]   75 	ld	a, c
+    0000001B D6 0D            [ 8]   76 	sub	a, #0x0d
+    0000001D D0               [20]   77 	ret	NC
+                                     78 ;src/bomb.c:32: move_sprite(exp_sprite_pool[i], 0, 0);
+    0000001E 21r34r00         [12]   79 	ld	hl, #_exp_sprite_pool
+    00000021 06 00            [ 8]   80 	ld	b, #0x00
+    00000023 09               [ 8]   81 	add	hl, bc
+    00000024 46               [ 8]   82 	ld	b, (hl)
+                                     83 ;/home/enne2/.local/gbdk/include/gb/gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    00000025 AF               [ 4]   84 	xor	a, a
+    00000026 68               [ 4]   85 	ld	l, b
+    00000027 67               [ 4]   86 	ld	h, a
+    00000028 29               [ 8]   87 	add	hl, hl
+    00000029 29               [ 8]   88 	add	hl, hl
+    0000002A 11r00r00         [12]   89 	ld	de, #_shadow_OAM
+    0000002D 19               [ 8]   90 	add	hl, de
+                                     91 ;/home/enne2/.local/gbdk/include/gb/gb.h:1974: itm->y=y, itm->x=x;
+    0000002E AF               [ 4]   92 	xor	a, a
+    0000002F 22               [ 8]   93 	ld	(hl+), a
+    00000030 77               [ 8]   94 	ld	(hl), a
+                                     95 ;src/bomb.c:31: for(uint8_t i = 0; i < EXP_POOL_SIZE; i++) {
+    00000031 0C               [ 4]   96 	inc	c
+                                     97 ;src/bomb.c:34: }
+    00000032 18 E6            [12]   98 	jr	00105$
+    00000034                         99 _exp_sprite_pool:
+    00000034 14                     100 	.db #0x14	; 20
+    00000035 15                     101 	.db #0x15	; 21
+    00000036 16                     102 	.db #0x16	; 22
+    00000037 17                     103 	.db #0x17	; 23
+    00000038 1D                     104 	.db #0x1d	; 29
+    00000039 1E                     105 	.db #0x1e	; 30
+    0000003A 1F                     106 	.db #0x1f	; 31
+    0000003B 20                     107 	.db #0x20	; 32
+    0000003C 21                     108 	.db #0x21	; 33
+    0000003D 22                     109 	.db #0x22	; 34
+    0000003E 23                     110 	.db #0x23	; 35
+    0000003F 24                     111 	.db #0x24	; 36
+    00000040 25                     112 	.db #0x25	; 37
+                                    113 ;src/bomb.c:36: void drop_bomb(uint8_t x, uint8_t y) {
+                                    114 ;	---------------------------------
+                                    115 ; Function drop_bomb
+                                    116 ; ---------------------------------
+    00000041                        117 _drop_bomb::
+    00000041 4F               [ 4]  118 	ld	c, a
+                                    119 ;src/bomb.c:37: if (bomb.state == BOMB_STATE_INACTIVE) {
+    00000042 21r00r00         [12]  120 	ld	hl, #_bomb
+    00000045 7E               [ 8]  121 	ld	a, (hl)
+    00000046 B7               [ 4]  122 	or	a, a
+    00000047 C0               [20]  123 	ret	NZ
+                                    124 ;src/bomb.c:38: bomb.state = BOMB_STATE_TICKING;
+    00000048 36 01            [12]  125 	ld	(hl), #0x01
+                                    126 ;src/bomb.c:39: bomb.x = x;
+    0000004A 21r01r00         [12]  127 	ld	hl, #_bomb + 1
+    0000004D 71               [ 8]  128 	ld	(hl), c
+                                    129 ;src/bomb.c:40: bomb.y = y;
+    0000004E 21r02r00         [12]  130 	ld	hl, #_bomb + 2
+    00000051 73               [ 8]  131 	ld	(hl), e
+                                    132 ;src/bomb.c:41: bomb.timer = 180; // 3 seconds
+    00000052 21r03r00         [12]  133 	ld	hl, #(_bomb + 3)
+    00000055 3E B4            [ 8]  134 	ld	a, #0xb4
+    00000057 22               [ 8]  135 	ld	(hl+), a
+    00000058 36 00            [12]  136 	ld	(hl), #0x00
+                                    137 ;src/bomb.c:42: play_sfx_bomb_drop(); // Suono innesco
+                                    138 ;src/bomb.c:44: }
+    0000005A C3r00r00         [16]  139 	jp	_play_sfx_bomb_drop
+                                    140 ;src/bomb.c:46: static void hide_explosion(void) {
+                                    141 ;	---------------------------------
+                                    142 ; Function hide_explosion
+                                    143 ; ---------------------------------
+    0000005D                        144 _hide_explosion:
+                                    145 ;/home/enne2/.local/gbdk/include/gb/gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    0000005D 21r98r00         [12]  146 	ld	hl, #(_shadow_OAM + 152)
+                                    147 ;/home/enne2/.local/gbdk/include/gb/gb.h:1974: itm->y=y, itm->x=x;
+    00000060 AF               [ 4]  148 	xor	a, a
+    00000061 22               [ 8]  149 	ld	(hl+), a
+    00000062 77               [ 8]  150 	ld	(hl), a
+                                    151 ;src/bomb.c:48: for(uint8_t i = 0; i < EXP_POOL_SIZE; i++) {
+    00000063 0E 00            [ 8]  152 	ld	c, #0x00
+    00000065                        153 00105$:
+    00000065 79               [ 4]  154 	ld	a, c
+    00000066 D6 0D            [ 8]  155 	sub	a, #0x0d
+    00000068 D0               [20]  156 	ret	NC
+                                    157 ;src/bomb.c:49: move_sprite(exp_sprite_pool[i], 0, 0);
+    00000069 21r34r00         [12]  158 	ld	hl, #_exp_sprite_pool
+    0000006C 06 00            [ 8]  159 	ld	b, #0x00
+    0000006E 09               [ 8]  160 	add	hl, bc
+    0000006F 46               [ 8]  161 	ld	b, (hl)
+                                    162 ;/home/enne2/.local/gbdk/include/gb/gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    00000070 AF               [ 4]  163 	xor	a, a
+    00000071 68               [ 4]  164 	ld	l, b
+    00000072 67               [ 4]  165 	ld	h, a
+    00000073 29               [ 8]  166 	add	hl, hl
+    00000074 29               [ 8]  167 	add	hl, hl
+    00000075 11r00r00         [12]  168 	ld	de, #_shadow_OAM
+    00000078 19               [ 8]  169 	add	hl, de
+                                    170 ;/home/enne2/.local/gbdk/include/gb/gb.h:1974: itm->y=y, itm->x=x;
+    00000079 AF               [ 4]  171 	xor	a, a
+    0000007A 22               [ 8]  172 	ld	(hl+), a
+    0000007B 77               [ 8]  173 	ld	(hl), a
+                                    174 ;src/bomb.c:48: for(uint8_t i = 0; i < EXP_POOL_SIZE; i++) {
+    0000007C 0C               [ 4]  175 	inc	c
+                                    176 ;src/bomb.c:51: }
+    0000007D 18 E6            [12]  177 	jr	00105$
+                                    178 ;src/bomb.c:53: static void do_explosion_damage(uint8_t ex, uint8_t ey) {
+                                    179 ;	---------------------------------
+                                    180 ; Function do_explosion_damage
+                                    181 ; ---------------------------------
+    0000007F                        182 _do_explosion_damage:
+                                    183 ;src/bomb.c:54: kill_rats_at(ex, ey);
+                                    184 ;src/bomb.c:55: }
+    0000007F C3r00r00         [16]  185 	jp	_kill_rats_at
+                                    186 ;src/bomb.c:57: void update_bombs(void) {
+                                    187 ;	---------------------------------
+                                    188 ; Function update_bombs
+                                    189 ; ---------------------------------
+    00000082                        190 _update_bombs::
+    00000082 E8 FA            [16]  191 	add	sp, #-6
+                                    192 ;src/bomb.c:58: if (bomb.state == BOMB_STATE_TICKING) {
+    00000084 FAr00r00         [16]  193 	ld	a, (#_bomb + 0)
+                                    194 ;src/bomb.c:59: bomb.timer--;
+                                    195 ;src/bomb.c:58: if (bomb.state == BOMB_STATE_TICKING) {
+    00000087 F8 05            [12]  196 	ldhl	sp,#5
+    00000089 77               [ 8]  197 	ld	(hl), a
+    0000008A 7E               [ 8]  198 	ld	a, (hl)
+    0000008B 3D               [ 4]  199 	dec	a
+    0000008C C2rDEr02         [16]  200 	jp	NZ, 00145$
+                                    201 ;src/bomb.c:59: bomb.timer--;
+    0000008F 21r03r00         [12]  202 	ld	hl, #(_bomb + 3)
+    00000092 2A               [ 8]  203 	ld	a, (hl+)
+    00000093 4F               [ 4]  204 	ld	c, a
+    00000094 46               [ 8]  205 	ld	b, (hl)
+    00000095 0B               [ 8]  206 	dec	bc
+    00000096 21r03r00         [12]  207 	ld	hl, #(_bomb + 3)
+    00000099 79               [ 4]  208 	ld	a, c
+    0000009A 22               [ 8]  209 	ld	(hl+), a
+    0000009B 70               [ 8]  210 	ld	(hl), b
+                                    211 ;src/bomb.c:61: uint8_t px = bomb.x * 8 + 12;
+    0000009C FAr01r00         [16]  212 	ld	a, (#(_bomb + 1) + 0)
+    0000009F 87               [ 4]  213 	add	a, a
+    000000A0 87               [ 4]  214 	add	a, a
+    000000A1 87               [ 4]  215 	add	a, a
+    000000A2 C6 0C            [ 8]  216 	add	a, #0x0c
+    000000A4 F8 02            [12]  217 	ldhl	sp,	#2
+                                    218 ;src/bomb.c:62: uint8_t py = bomb.y * 8 + 20;
+    000000A6 22               [ 8]  219 	ld	(hl+), a
+    000000A7 FAr02r00         [16]  220 	ld	a, (#(_bomb + 2) + 0)
+    000000AA 87               [ 4]  221 	add	a, a
+    000000AB 87               [ 4]  222 	add	a, a
+    000000AC 87               [ 4]  223 	add	a, a
+    000000AD C6 14            [ 8]  224 	add	a, #0x14
+    000000AF 77               [ 8]  225 	ld	(hl), a
+                                    226 ;src/bomb.c:64: if (bomb.timer > 120) {
+    000000B0 3E 78            [ 8]  227 	ld	a, #0x78
+    000000B2 B9               [ 4]  228 	cp	a, c
+    000000B3 3E 00            [ 8]  229 	ld	a, #0x00
+    000000B5 98               [ 4]  230 	sbc	a, b
+    000000B6 30 07            [12]  231 	jr	NC, 00108$
+                                    232 ;/home/enne2/.local/gbdk/include/gb/gb.h:1887: shadow_OAM[nb].tile=tile;
+    000000B8 21r9Ar00         [12]  233 	ld	hl, #(_shadow_OAM + 154)
+    000000BB 36 05            [12]  234 	ld	(hl), #0x05
+                                    235 ;src/bomb.c:65: set_sprite_tile(38, 5); // bomb_3
+    000000BD 18 27            [12]  236 	jr	00109$
+    000000BF                        237 00108$:
+                                    238 ;src/bomb.c:66: } else if (bomb.timer > 60) {
+    000000BF 21r03r00         [12]  239 	ld	hl, #(_bomb + 3)
+    000000C2 2A               [ 8]  240 	ld	a, (hl+)
+    000000C3 4F               [ 4]  241 	ld	c, a
+    000000C4 46               [ 8]  242 	ld	b, (hl)
+    000000C5 59               [ 4]  243 	ld	e, c
+    000000C6 50               [ 4]  244 	ld	d, b
+    000000C7 3E 3C            [ 8]  245 	ld	a, #0x3c
+    000000C9 BB               [ 4]  246 	cp	a, e
+    000000CA 3E 00            [ 8]  247 	ld	a, #0x00
+    000000CC 9A               [ 4]  248 	sbc	a, d
+    000000CD 30 07            [12]  249 	jr	NC, 00105$
+                                    250 ;/home/enne2/.local/gbdk/include/gb/gb.h:1887: shadow_OAM[nb].tile=tile;
+    000000CF 21r9Ar00         [12]  251 	ld	hl, #(_shadow_OAM + 154)
+    000000D2 36 06            [12]  252 	ld	(hl), #0x06
+                                    253 ;src/bomb.c:67: set_sprite_tile(38, 6); // bomb_2
+    000000D4 18 10            [12]  254 	jr	00109$
+    000000D6                        255 00105$:
+                                    256 ;src/bomb.c:69: if (bomb.timer & 4) {
+    000000D6 CB 51            [ 8]  257 	bit	2, c
+    000000D8 28 07            [12]  258 	jr	Z, 00102$
+                                    259 ;/home/enne2/.local/gbdk/include/gb/gb.h:1887: shadow_OAM[nb].tile=tile;
+    000000DA 21r9Ar00         [12]  260 	ld	hl, #(_shadow_OAM + 154)
+    000000DD 36 07            [12]  261 	ld	(hl), #0x07
+                                    262 ;src/bomb.c:70: set_sprite_tile(38, 7); // bomb_1
+    000000DF 18 05            [12]  263 	jr	00109$
+    000000E1                        264 00102$:
+                                    265 ;/home/enne2/.local/gbdk/include/gb/gb.h:1887: shadow_OAM[nb].tile=tile;
+    000000E1 21r9Ar00         [12]  266 	ld	hl, #(_shadow_OAM + 154)
+    000000E4 36 05            [12]  267 	ld	(hl), #0x05
+                                    268 ;src/bomb.c:72: set_sprite_tile(38, 5);
+    000000E6                        269 00109$:
+                                    270 ;/home/enne2/.local/gbdk/include/gb/gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    000000E6 01r98r00         [12]  271 	ld	bc, #_shadow_OAM+152
+                                    272 ;/home/enne2/.local/gbdk/include/gb/gb.h:1974: itm->y=y, itm->x=x;
+    000000E9 F8 03            [12]  273 	ldhl	sp,	#3
+    000000EB 3A               [ 8]  274 	ld	a, (hl-)
+    000000EC 02               [ 8]  275 	ld	(bc), a
+    000000ED 03               [ 8]  276 	inc	bc
+    000000EE 7E               [ 8]  277 	ld	a, (hl)
+    000000EF 02               [ 8]  278 	ld	(bc), a
+                                    279 ;src/bomb.c:78: if (bomb.timer == 0) {
+    000000F0 21r03r00         [12]  280 	ld	hl, #(_bomb + 3)
+    000000F3 2A               [ 8]  281 	ld	a, (hl+)
+    000000F4 B6               [ 8]  282 	or	a, (hl)
+    000000F5 C2rFEr02         [16]  283 	jp	NZ, 00162$
+                                    284 ;src/bomb.c:79: bomb.state = BOMB_STATE_EXPLODING;
+    000000F8 21r00r00         [12]  285 	ld	hl, #_bomb
+    000000FB 36 02            [12]  286 	ld	(hl), #0x02
+                                    287 ;src/bomb.c:80: bomb.timer = 30; // 0.5s explosion
+    000000FD 21r03r00         [12]  288 	ld	hl, #(_bomb + 3)
+    00000100 3E 1E            [ 8]  289 	ld	a, #0x1e
+    00000102 22               [ 8]  290 	ld	(hl+), a
+    00000103 36 00            [12]  291 	ld	(hl), #0x00
+                                    292 ;src/bomb.c:82: play_sfx_explosion();
+    00000105 CDr00r00         [24]  293 	call	_play_sfx_explosion
+                                    294 ;/home/enne2/.local/gbdk/include/gb/gb.h:1887: shadow_OAM[nb].tile=tile;
+    00000108 21r9Ar00         [12]  295 	ld	hl, #(_shadow_OAM + 154)
+    0000010B 36 08            [12]  296 	ld	(hl), #0x08
+                                    297 ;/home/enne2/.local/gbdk/include/gb/gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    0000010D 01r98r00         [12]  298 	ld	bc, #_shadow_OAM+152
+                                    299 ;/home/enne2/.local/gbdk/include/gb/gb.h:1974: itm->y=y, itm->x=x;
+    00000110 F8 03            [12]  300 	ldhl	sp,	#3
+    00000112 3A               [ 8]  301 	ld	a, (hl-)
+    00000113 02               [ 8]  302 	ld	(bc), a
+    00000114 03               [ 8]  303 	inc	bc
+    00000115 7E               [ 8]  304 	ld	a, (hl)
+    00000116 02               [ 8]  305 	ld	(bc), a
+                                    306 ;src/bomb.c:86: do_explosion_damage(bomb.x, bomb.y);
+    00000117 21r02r00         [12]  307 	ld	hl, #(_bomb + 2)
+    0000011A 5E               [ 8]  308 	ld	e, (hl)
+    0000011B FAr01r00         [16]  309 	ld	a, (#(_bomb + 1) + 0)
+    0000011E CDr7Fr00         [24]  310 	call	_do_explosion_damage
+                                    311 ;src/bomb.c:91: uint8_t yy = bomb.y;
+    00000121 FAr02r00         [16]  312 	ld	a, (#(_bomb + 2) + 0)
+    00000124 F8 04            [12]  313 	ldhl	sp,	#4
+    00000126 77               [ 8]  314 	ld	(hl), a
+                                    315 ;src/bomb.c:92: while (yy > 0) {
+    00000127 F8 05            [12]  316 	ldhl	sp,	#5
+    00000129 36 00            [12]  317 	ld	(hl), #0x00
+    0000012B                        318 00114$:
+    0000012B F8 04            [12]  319 	ldhl	sp,	#4
+    0000012D 7E               [ 8]  320 	ld	a, (hl)
+    0000012E B7               [ 4]  321 	or	a, a
+    0000012F 28 62            [12]  322 	jr	Z, 00116$
+                                    323 ;src/bomb.c:93: yy--;
+    00000131 35               [12]  324 	dec	(hl)
+                                    325 ;src/bomb.c:94: if (maze[yy][bomb.x] != 0) break;
+    00000132 4E               [ 8]  326 	ld	c, (hl)
+    00000133 AF               [ 4]  327 	xor	a, a
+    00000134 69               [ 4]  328 	ld	l, c
+    00000135 67               [ 4]  329 	ld	h, a
+    00000136 29               [ 8]  330 	add	hl, hl
+    00000137 29               [ 8]  331 	add	hl, hl
+    00000138 29               [ 8]  332 	add	hl, hl
+    00000139 29               [ 8]  333 	add	hl, hl
+    0000013A 29               [ 8]  334 	add	hl, hl
+    0000013B 7D               [ 4]  335 	ld	a, l
+    0000013C C6r00            [ 8]  336 	add	a, #<(_maze)
+    0000013E 4F               [ 4]  337 	ld	c, a
+    0000013F 7C               [ 4]  338 	ld	a, h
+    00000140 CEs00            [ 8]  339 	adc	a, #>(_maze)
+    00000142 47               [ 4]  340 	ld	b, a
+    00000143 21r01r00         [12]  341 	ld	hl, #(_bomb + 1)
+    00000146 6E               [ 8]  342 	ld	l, (hl)
+    00000147 26 00            [ 8]  343 	ld	h, #0x00
+    00000149 09               [ 8]  344 	add	hl, bc
+    0000014A 7E               [ 8]  345 	ld	a, (hl)
+    0000014B B7               [ 4]  346 	or	a, a
+    0000014C 20 45            [12]  347 	jr	NZ, 00116$
+                                    348 ;src/bomb.c:95: if (pool_idx < EXP_POOL_SIZE) {
+    0000014E F8 05            [12]  349 	ldhl	sp,	#5
+    00000150 7E               [ 8]  350 	ld	a, (hl)
+    00000151 D6 0D            [ 8]  351 	sub	a, #0x0d
+    00000153 30 33            [12]  352 	jr	NC, 00113$
+                                    353 ;src/bomb.c:96: uint8_t sp = exp_sprite_pool[pool_idx++];
+    00000155 11r34r00         [12]  354 	ld	de, #_exp_sprite_pool
+    00000158 6E               [ 8]  355 	ld	l, (hl)
+    00000159 26 00            [ 8]  356 	ld	h, #0x00
+    0000015B 19               [ 8]  357 	add	hl, de
+    0000015C 33               [ 8]  358 	inc	sp
+    0000015D 33               [ 8]  359 	inc	sp
+    0000015E E5               [16]  360 	push	hl
+    0000015F F8 05            [12]  361 	ldhl	sp,	#5
+    00000161 34               [12]  362 	inc	(hl)
+    00000162 D1               [12]  363 	pop	de
+    00000163 D5               [16]  364 	push	de
+    00000164 1A               [ 8]  365 	ld	a, (de)
+                                    366 ;/home/enne2/.local/gbdk/include/gb/gb.h:1887: shadow_OAM[nb].tile=tile;
+    00000165 6F               [ 4]  367 	ld	l, a
+    00000166 26 00            [ 8]  368 	ld	h, #0x00
+    00000168 29               [ 8]  369 	add	hl, hl
+    00000169 29               [ 8]  370 	add	hl, hl
+    0000016A 5D               [ 4]  371 	ld	e, l
+    0000016B 54               [ 4]  372 	ld	d, h
+    0000016C 21r01r00         [12]  373 	ld	hl,#_shadow_OAM + 1
+    0000016F 19               [ 8]  374 	add	hl,de
+    00000170 23               [ 8]  375 	inc	hl
+    00000171 36 0A            [12]  376 	ld	(hl), #0x0a
+                                    377 ;src/bomb.c:98: move_sprite(sp, px, (yy * 8) + 20);
+    00000173 F8 04            [12]  378 	ldhl	sp,	#4
+    00000175 7E               [ 8]  379 	ld	a, (hl)
+    00000176 87               [ 4]  380 	add	a, a
+    00000177 87               [ 4]  381 	add	a, a
+    00000178 87               [ 4]  382 	add	a, a
+    00000179 C6 14            [ 8]  383 	add	a, #0x14
+    0000017B 4F               [ 4]  384 	ld	c, a
+                                    385 ;/home/enne2/.local/gbdk/include/gb/gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    0000017C 21r00r00         [12]  386 	ld	hl, #_shadow_OAM
+    0000017F 19               [ 8]  387 	add	hl, de
+                                    388 ;/home/enne2/.local/gbdk/include/gb/gb.h:1974: itm->y=y, itm->x=x;
+    00000180 79               [ 4]  389 	ld	a, c
+    00000181 22               [ 8]  390 	ld	(hl+), a
+    00000182 4D               [ 4]  391 	ld	c, l
+    00000183 44               [ 4]  392 	ld	b, h
+    00000184 F8 02            [12]  393 	ldhl	sp,	#2
+    00000186 7E               [ 8]  394 	ld	a, (hl)
+    00000187 02               [ 8]  395 	ld	(bc), a
+                                    396 ;src/bomb.c:98: move_sprite(sp, px, (yy * 8) + 20);
+    00000188                        397 00113$:
+                                    398 ;src/bomb.c:100: do_explosion_damage(bomb.x, yy);
+    00000188 FAr01r00         [16]  399 	ld	a, (#(_bomb + 1) + 0)
+    0000018B F8 04            [12]  400 	ldhl	sp,	#4
+    0000018D 5E               [ 8]  401 	ld	e, (hl)
+    0000018E CDr7Fr00         [24]  402 	call	_do_explosion_damage
+    00000191 18 98            [12]  403 	jr	00114$
+    00000193                        404 00116$:
+                                    405 ;src/bomb.c:104: yy = bomb.y;
+    00000193 21r02r00         [12]  406 	ld	hl, #(_bomb + 2)
+    00000196 4E               [ 8]  407 	ld	c, (hl)
+                                    408 ;src/bomb.c:105: while (yy < MAZE_HEIGHT - 1) {
+    00000197                        409 00121$:
+                                    410 ;src/bomb.c:61: uint8_t px = bomb.x * 8 + 12;
+    00000197 21r01r00         [12]  411 	ld	hl, #(_bomb + 1)
+    0000019A 46               [ 8]  412 	ld	b, (hl)
+                                    413 ;src/bomb.c:105: while (yy < MAZE_HEIGHT - 1) {
+    0000019B 79               [ 4]  414 	ld	a, c
+    0000019C D6 10            [ 8]  415 	sub	a, #0x10
+    0000019E 30 55            [12]  416 	jr	NC, 00123$
+                                    417 ;src/bomb.c:106: yy++;
+    000001A0 0C               [ 4]  418 	inc	c
+                                    419 ;src/bomb.c:107: if (maze[yy][bomb.x] != 0) break;
+    000001A1 69               [ 4]  420 	ld	l, c
+    000001A2 AF               [ 4]  421 	xor	a, a
+    000001A3 67               [ 4]  422 	ld	h, a
+    000001A4 29               [ 8]  423 	add	hl, hl
+    000001A5 29               [ 8]  424 	add	hl, hl
+    000001A6 29               [ 8]  425 	add	hl, hl
+    000001A7 29               [ 8]  426 	add	hl, hl
+    000001A8 29               [ 8]  427 	add	hl, hl
+    000001A9 11r00r00         [12]  428 	ld	de, #_maze
+    000001AC 19               [ 8]  429 	add	hl, de
+    000001AD 58               [ 4]  430 	ld	e, b
+    000001AE 16 00            [ 8]  431 	ld	d, #0x00
+    000001B0 19               [ 8]  432 	add	hl, de
+    000001B1 7E               [ 8]  433 	ld	a, (hl)
+    000001B2 B7               [ 4]  434 	or	a, a
+    000001B3 20 40            [12]  435 	jr	NZ, 00123$
+                                    436 ;src/bomb.c:108: if (pool_idx < EXP_POOL_SIZE) {
+    000001B5 F8 05            [12]  437 	ldhl	sp,	#5
+    000001B7 7E               [ 8]  438 	ld	a, (hl)
+    000001B8 D6 0D            [ 8]  439 	sub	a, #0x0d
+    000001BA 30 2E            [12]  440 	jr	NC, 00120$
+                                    441 ;src/bomb.c:109: uint8_t sp = exp_sprite_pool[pool_idx++];
+    000001BC 11r34r00         [12]  442 	ld	de, #_exp_sprite_pool
+    000001BF 6E               [ 8]  443 	ld	l, (hl)
+    000001C0 26 00            [ 8]  444 	ld	h, #0x00
+    000001C2 19               [ 8]  445 	add	hl, de
+    000001C3 5D               [ 4]  446 	ld	e, l
+    000001C4 54               [ 4]  447 	ld	d, h
+    000001C5 F8 05            [12]  448 	ldhl	sp,	#5
+    000001C7 34               [12]  449 	inc	(hl)
+    000001C8 1A               [ 8]  450 	ld	a, (de)
+                                    451 ;/home/enne2/.local/gbdk/include/gb/gb.h:1887: shadow_OAM[nb].tile=tile;
+    000001C9 6F               [ 4]  452 	ld	l, a
+    000001CA 26 00            [ 8]  453 	ld	h, #0x00
+    000001CC 29               [ 8]  454 	add	hl, hl
+    000001CD 29               [ 8]  455 	add	hl, hl
+    000001CE 5D               [ 4]  456 	ld	e, l
+    000001CF 54               [ 4]  457 	ld	d, h
+    000001D0 21r01r00         [12]  458 	ld	hl,#_shadow_OAM + 1
+    000001D3 19               [ 8]  459 	add	hl,de
+    000001D4 23               [ 8]  460 	inc	hl
+    000001D5 36 0A            [12]  461 	ld	(hl), #0x0a
+                                    462 ;src/bomb.c:111: move_sprite(sp, px, (yy * 8) + 20);
+    000001D7 79               [ 4]  463 	ld	a, c
+    000001D8 87               [ 4]  464 	add	a, a
+    000001D9 87               [ 4]  465 	add	a, a
+    000001DA 87               [ 4]  466 	add	a, a
+    000001DB C6 14            [ 8]  467 	add	a, #0x14
+    000001DD 47               [ 4]  468 	ld	b, a
+                                    469 ;/home/enne2/.local/gbdk/include/gb/gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    000001DE 21r00r00         [12]  470 	ld	hl, #_shadow_OAM
+    000001E1 19               [ 8]  471 	add	hl, de
+                                    472 ;/home/enne2/.local/gbdk/include/gb/gb.h:1974: itm->y=y, itm->x=x;
+    000001E2 78               [ 4]  473 	ld	a, b
+    000001E3 22               [ 8]  474 	ld	(hl+), a
+    000001E4 5D               [ 4]  475 	ld	e, l
+    000001E5 54               [ 4]  476 	ld	d, h
+    000001E6 F8 02            [12]  477 	ldhl	sp,	#2
+    000001E8 7E               [ 8]  478 	ld	a, (hl)
+    000001E9 12               [ 8]  479 	ld	(de), a
+                                    480 ;src/bomb.c:111: move_sprite(sp, px, (yy * 8) + 20);
+    000001EA                        481 00120$:
+                                    482 ;src/bomb.c:113: do_explosion_damage(bomb.x, yy);
+    000001EA FAr01r00         [16]  483 	ld	a, (#(_bomb + 1) + 0)
+    000001ED C5               [16]  484 	push	bc
+    000001EE 59               [ 4]  485 	ld	e, c
+    000001EF CDr7Fr00         [24]  486 	call	_do_explosion_damage
+    000001F2 C1               [12]  487 	pop	bc
+    000001F3 18 A2            [12]  488 	jr	00121$
+    000001F5                        489 00123$:
+                                    490 ;src/bomb.c:117: uint8_t xx = bomb.x;
+    000001F5 F8 04            [12]  491 	ldhl	sp,	#4
+                                    492 ;src/bomb.c:118: while (xx > 0) {
+    000001F7 78               [ 4]  493 	ld	a, b
+    000001F8 22               [ 8]  494 	ld	(hl+), a
+    000001F9 4E               [ 8]  495 	ld	c, (hl)
+    000001FA                        496 00128$:
+    000001FA F8 04            [12]  497 	ldhl	sp,	#4
+    000001FC 7E               [ 8]  498 	ld	a, (hl)
+    000001FD B7               [ 4]  499 	or	a, a
+    000001FE 28 6B            [12]  500 	jr	Z, 00130$
+                                    501 ;src/bomb.c:119: xx--;
+    00000200 35               [12]  502 	dec	(hl)
+                                    503 ;src/bomb.c:120: if (maze[bomb.y][xx] != 0) break;
+    00000201 21r02r00         [12]  504 	ld	hl, #(_bomb + 2)
+    00000204 6E               [ 8]  505 	ld	l, (hl)
+    00000205 26 00            [ 8]  506 	ld	h, #0x00
+    00000207 29               [ 8]  507 	add	hl, hl
+    00000208 29               [ 8]  508 	add	hl, hl
+    00000209 29               [ 8]  509 	add	hl, hl
+    0000020A 29               [ 8]  510 	add	hl, hl
+    0000020B 29               [ 8]  511 	add	hl, hl
+    0000020C 7D               [ 4]  512 	ld	a, l
+    0000020D C6r00            [ 8]  513 	add	a, #<(_maze)
+    0000020F 5F               [ 4]  514 	ld	e, a
+    00000210 7C               [ 4]  515 	ld	a, h
+    00000211 CEs00            [ 8]  516 	adc	a, #>(_maze)
+    00000213 57               [ 4]  517 	ld	d, a
+    00000214 F8 04            [12]  518 	ldhl	sp,	#4
+    00000216 6E               [ 8]  519 	ld	l, (hl)
+    00000217 26 00            [ 8]  520 	ld	h, #0x00
+    00000219 19               [ 8]  521 	add	hl, de
+    0000021A 5D               [ 4]  522 	ld	e, l
+    0000021B 54               [ 4]  523 	ld	d, h
+    0000021C 1A               [ 8]  524 	ld	a, (de)
+    0000021D B7               [ 4]  525 	or	a, a
+    0000021E 20 4B            [12]  526 	jr	NZ, 00130$
+                                    527 ;src/bomb.c:121: if (pool_idx < EXP_POOL_SIZE) {
+    00000220 79               [ 4]  528 	ld	a, c
+    00000221 D6 0D            [ 8]  529 	sub	a, #0x0d
+    00000223 30 38            [12]  530 	jr	NC, 00127$
+                                    531 ;src/bomb.c:122: uint8_t sp = exp_sprite_pool[pool_idx++];
+    00000225 11r34r00         [12]  532 	ld	de, #_exp_sprite_pool
+    00000228 69               [ 4]  533 	ld	l, c
+    00000229 26 00            [ 8]  534 	ld	h, #0x00
+    0000022B 19               [ 8]  535 	add	hl, de
+    0000022C E5               [16]  536 	push	hl
+    0000022D 7D               [ 4]  537 	ld	a, l
+    0000022E F8 03            [12]  538 	ldhl	sp,	#3
+    00000230 77               [ 8]  539 	ld	(hl), a
+    00000231 E1               [12]  540 	pop	hl
+    00000232 7C               [ 4]  541 	ld	a, h
+    00000233 F8 02            [12]  542 	ldhl	sp,	#2
+    00000235 32               [ 8]  543 	ld	(hl-), a
+    00000236 0C               [ 4]  544 	inc	c
+    00000237 2A               [ 8]  545 	ld	a, (hl+)
+    00000238 5F               [ 4]  546 	ld	e, a
+    00000239 56               [ 8]  547 	ld	d, (hl)
+    0000023A 1A               [ 8]  548 	ld	a, (de)
+                                    549 ;/home/enne2/.local/gbdk/include/gb/gb.h:1887: shadow_OAM[nb].tile=tile;
+    0000023B 6F               [ 4]  550 	ld	l, a
+    0000023C 26 00            [ 8]  551 	ld	h, #0x00
+    0000023E 29               [ 8]  552 	add	hl, hl
+    0000023F 29               [ 8]  553 	add	hl, hl
+    00000240 5D               [ 4]  554 	ld	e, l
+    00000241 54               [ 4]  555 	ld	d, h
+    00000242 21r01r00         [12]  556 	ld	hl,#_shadow_OAM + 1
+    00000245 19               [ 8]  557 	add	hl,de
+    00000246 23               [ 8]  558 	inc	hl
+    00000247 36 09            [12]  559 	ld	(hl), #0x09
+                                    560 ;src/bomb.c:124: move_sprite(sp, (xx * 8) + 12, py);
+    00000249 F8 04            [12]  561 	ldhl	sp,	#4
+    0000024B 7E               [ 8]  562 	ld	a, (hl)
+    0000024C 87               [ 4]  563 	add	a, a
+    0000024D 87               [ 4]  564 	add	a, a
+    0000024E 87               [ 4]  565 	add	a, a
+    0000024F C6 0C            [ 8]  566 	add	a, #0x0c
+    00000251 47               [ 4]  567 	ld	b, a
+                                    568 ;/home/enne2/.local/gbdk/include/gb/gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    00000252 21r00r00         [12]  569 	ld	hl, #_shadow_OAM
+    00000255 19               [ 8]  570 	add	hl, de
+                                    571 ;/home/enne2/.local/gbdk/include/gb/gb.h:1974: itm->y=y, itm->x=x;
+    00000256 E5               [16]  572 	push	hl
+    00000257 F8 05            [12]  573 	ldhl	sp,	#5
+    00000259 7E               [ 8]  574 	ld	a, (hl)
+    0000025A E1               [12]  575 	pop	hl
+    0000025B 22               [ 8]  576 	ld	(hl+), a
+    0000025C 70               [ 8]  577 	ld	(hl), b
+                                    578 ;src/bomb.c:124: move_sprite(sp, (xx * 8) + 12, py);
+    0000025D                        579 00127$:
+                                    580 ;src/bomb.c:126: do_explosion_damage(xx, bomb.y);
+    0000025D FAr02r00         [16]  581 	ld	a, (#(_bomb + 2) + 0)
+    00000260 C5               [16]  582 	push	bc
+    00000261 5F               [ 4]  583 	ld	e, a
+    00000262 F8 06            [12]  584 	ldhl	sp,	#6
+    00000264 7E               [ 8]  585 	ld	a, (hl)
+    00000265 CDr7Fr00         [24]  586 	call	_do_explosion_damage
+    00000268 C1               [12]  587 	pop	bc
+    00000269 18 8F            [12]  588 	jr	00128$
+    0000026B                        589 00130$:
+                                    590 ;src/bomb.c:130: xx = bomb.x;
+    0000026B FAr01r00         [16]  591 	ld	a, (#(_bomb + 1) + 0)
+    0000026E F8 04            [12]  592 	ldhl	sp,	#4
+    00000270 77               [ 8]  593 	ld	(hl), a
+                                    594 ;src/bomb.c:131: while (xx < MAZE_WIDTH - 1) {
+    00000271 F8 05            [12]  595 	ldhl	sp,	#5
+    00000273 71               [ 8]  596 	ld	(hl), c
+    00000274                        597 00135$:
+    00000274 F8 04            [12]  598 	ldhl	sp,	#4
+    00000276 7E               [ 8]  599 	ld	a, (hl)
+    00000277 D6 12            [ 8]  600 	sub	a, #0x12
+    00000279 D2rFEr02         [16]  601 	jp	NC, 00162$
+                                    602 ;src/bomb.c:132: xx++;
+    0000027C 34               [12]  603 	inc	(hl)
+                                    604 ;src/bomb.c:133: if (maze[bomb.y][xx] != 0) break;
+    0000027D 21r02r00         [12]  605 	ld	hl, #(_bomb + 2)
+    00000280 6E               [ 8]  606 	ld	l, (hl)
+    00000281 AF               [ 4]  607 	xor	a, a
+    00000282 67               [ 4]  608 	ld	h, a
+    00000283 29               [ 8]  609 	add	hl, hl
+    00000284 29               [ 8]  610 	add	hl, hl
+    00000285 29               [ 8]  611 	add	hl, hl
+    00000286 29               [ 8]  612 	add	hl, hl
+    00000287 29               [ 8]  613 	add	hl, hl
+    00000288 7D               [ 4]  614 	ld	a, l
+    00000289 C6r00            [ 8]  615 	add	a, #<(_maze)
+    0000028B 4F               [ 4]  616 	ld	c, a
+    0000028C 7C               [ 4]  617 	ld	a, h
+    0000028D CEs00            [ 8]  618 	adc	a, #>(_maze)
+    0000028F 47               [ 4]  619 	ld	b, a
+    00000290 F8 04            [12]  620 	ldhl	sp,	#4
+    00000292 6E               [ 8]  621 	ld	l, (hl)
+    00000293 26 00            [ 8]  622 	ld	h, #0x00
+    00000295 09               [ 8]  623 	add	hl, bc
+    00000296 4D               [ 4]  624 	ld	c, l
+    00000297 44               [ 4]  625 	ld	b, h
+    00000298 0A               [ 8]  626 	ld	a, (bc)
+    00000299 B7               [ 4]  627 	or	a, a
+    0000029A 20 62            [12]  628 	jr	NZ, 00162$
+                                    629 ;src/bomb.c:134: if (pool_idx < EXP_POOL_SIZE) {
+    0000029C F8 05            [12]  630 	ldhl	sp,	#5
+    0000029E 7E               [ 8]  631 	ld	a, (hl)
+    0000029F D6 0D            [ 8]  632 	sub	a, #0x0d
+    000002A1 30 2F            [12]  633 	jr	NC, 00134$
+                                    634 ;src/bomb.c:135: uint8_t sp = exp_sprite_pool[pool_idx++];
+    000002A3 11r34r00         [12]  635 	ld	de, #_exp_sprite_pool
+    000002A6 6E               [ 8]  636 	ld	l, (hl)
+    000002A7 26 00            [ 8]  637 	ld	h, #0x00
+    000002A9 19               [ 8]  638 	add	hl, de
+    000002AA 4D               [ 4]  639 	ld	c, l
+    000002AB 44               [ 4]  640 	ld	b, h
+    000002AC F8 05            [12]  641 	ldhl	sp,	#5
+    000002AE 34               [12]  642 	inc	(hl)
+    000002AF 0A               [ 8]  643 	ld	a, (bc)
+                                    644 ;/home/enne2/.local/gbdk/include/gb/gb.h:1887: shadow_OAM[nb].tile=tile;
+    000002B0 6F               [ 4]  645 	ld	l, a
+    000002B1 26 00            [ 8]  646 	ld	h, #0x00
+    000002B3 29               [ 8]  647 	add	hl, hl
+    000002B4 29               [ 8]  648 	add	hl, hl
+    000002B5 5D               [ 4]  649 	ld	e, l
+    000002B6 54               [ 4]  650 	ld	d, h
+    000002B7 21r01r00         [12]  651 	ld	hl,#_shadow_OAM + 1
+    000002BA 19               [ 8]  652 	add	hl,de
+    000002BB 23               [ 8]  653 	inc	hl
+    000002BC 36 09            [12]  654 	ld	(hl), #0x09
+                                    655 ;src/bomb.c:137: move_sprite(sp, (xx * 8) + 12, py);
+    000002BE F8 04            [12]  656 	ldhl	sp,	#4
+    000002C0 7E               [ 8]  657 	ld	a, (hl)
+    000002C1 87               [ 4]  658 	add	a, a
+    000002C2 87               [ 4]  659 	add	a, a
+    000002C3 87               [ 4]  660 	add	a, a
+    000002C4 C6 0C            [ 8]  661 	add	a, #0x0c
+    000002C6 4F               [ 4]  662 	ld	c, a
+                                    663 ;/home/enne2/.local/gbdk/include/gb/gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    000002C7 21r00r00         [12]  664 	ld	hl, #_shadow_OAM
+    000002CA 19               [ 8]  665 	add	hl, de
+                                    666 ;/home/enne2/.local/gbdk/include/gb/gb.h:1974: itm->y=y, itm->x=x;
+    000002CB E5               [16]  667 	push	hl
+    000002CC F8 05            [12]  668 	ldhl	sp,	#5
+    000002CE 7E               [ 8]  669 	ld	a, (hl)
+    000002CF E1               [12]  670 	pop	hl
+    000002D0 22               [ 8]  671 	ld	(hl+), a
+    000002D1 71               [ 8]  672 	ld	(hl), c
+                                    673 ;src/bomb.c:137: move_sprite(sp, (xx * 8) + 12, py);
+    000002D2                        674 00134$:
+                                    675 ;src/bomb.c:139: do_explosion_damage(xx, bomb.y);
+    000002D2 FAr02r00         [16]  676 	ld	a, (#(_bomb + 2) + 0)
+    000002D5 5F               [ 4]  677 	ld	e, a
+    000002D6 F8 04            [12]  678 	ldhl	sp,	#4
+    000002D8 7E               [ 8]  679 	ld	a, (hl)
+    000002D9 CDr7Fr00         [24]  680 	call	_do_explosion_damage
+    000002DC 18 96            [12]  681 	jr	00135$
+    000002DE                        682 00145$:
+                                    683 ;src/bomb.c:142: } else if (bomb.state == BOMB_STATE_EXPLODING) {
+    000002DE F8 05            [12]  684 	ldhl	sp,	#5
+    000002E0 7E               [ 8]  685 	ld	a, (hl)
+    000002E1 D6 02            [ 8]  686 	sub	a, #0x02
+    000002E3 20 19            [12]  687 	jr	NZ, 00162$
+                                    688 ;src/bomb.c:143: bomb.timer--;
+    000002E5 21r03r00         [12]  689 	ld	hl, #(_bomb + 3)
+    000002E8 2A               [ 8]  690 	ld	a, (hl+)
+    000002E9 4F               [ 4]  691 	ld	c, a
+    000002EA 46               [ 8]  692 	ld	b, (hl)
+    000002EB 0B               [ 8]  693 	dec	bc
+    000002EC 21r03r00         [12]  694 	ld	hl, #(_bomb + 3)
+    000002EF 79               [ 4]  695 	ld	a, c
+    000002F0 22               [ 8]  696 	ld	(hl+), a
+    000002F1 70               [ 8]  697 	ld	(hl), b
+                                    698 ;src/bomb.c:144: if (bomb.timer == 0) {
+    000002F2 78               [ 4]  699 	ld	a, b
+    000002F3 B1               [ 4]  700 	or	a, c
+    000002F4 20 08            [12]  701 	jr	NZ, 00162$
+                                    702 ;src/bomb.c:145: bomb.state = BOMB_STATE_INACTIVE;
+    000002F6 21r00r00         [12]  703 	ld	hl, #_bomb
+    000002F9 36 00            [12]  704 	ld	(hl), #0x00
+                                    705 ;src/bomb.c:146: hide_explosion();
+    000002FB CDr5Dr00         [24]  706 	call	_hide_explosion
+    000002FE                        707 00162$:
+                                    708 ;src/bomb.c:149: }
+    000002FE E8 06            [16]  709 	add	sp, #6
+    00000300 C9               [16]  710 	ret
+                                    711 	.area _CODE
+                                    712 	.area _INITIALIZER
+                                    713 	.area _CABS (ABS)

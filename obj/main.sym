@@ -1,0 +1,83 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 1
+Hexadecimal [32-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =   00002710 L
+    .__.ABS.                                                    =   00000000 G
+    .__.CPU.                                                    =   00000000 L
+    .__.H$L.                                                    =   00000000 L
+    _BGP_REG                                                        ******** GX
+    _DIV_REG                                                        ******** GX
+    _LCDC_REG                                                       ******** GX
+    _NR10_REG                                                       ******** GX
+    _NR11_REG                                                       ******** GX
+    _NR12_REG                                                       ******** GX
+    _NR13_REG                                                       ******** GX
+    _NR14_REG                                                       ******** GX
+    _NumberTiles                                                    ******** GX
+    _OBP0_REG                                                       ******** GX
+    _OBP1_REG                                                       ******** GX
+    _PauseTiles                                                     ******** GX
+    _SCX_REG                                                        ******** GX
+    _SCY_REG                                                        ******** GX
+    _TileData                                                       ******** GX
+    __moduchar                                                      ******** GX
+  8 __xinit__main_prev_keys                                         00000000 R
+    _display_off                                                    ******** GX
+    _game_over_flag                                                 ******** GX
+    _generate_maze                                                  ******** GX
+    _init_bombs                                                     ******** GX
+    _init_cursor                                                    ******** GX
+    _init_music                                                     ******** GX
+    _init_rats                                                      ******** GX
+    _initrand                                                       ******** GX
+    _joypad                                                         ******** GX
+  0 _main                                                           00000000 GR
+  3 _main_prev_keys                                                 00000000 R
+    _maze                                                           ******** GX
+    _play_game_over_music                                           ******** GX
+    _play_title_music                                               ******** GX
+    _play_victory_music                                             ******** GX
+    _rand                                                           ******** GX
+    _rat_bg_map                                                     ******** GX
+    _rat_bg_tiles                                                   ******** GX
+    _reset                                                          ******** GX
+    _set_bkg_data                                                   ******** GX
+    _set_bkg_tiles                                                  ******** GX
+    _set_sprite_data                                                ******** GX
+    _shadow_OAM                                                     ******** GX
+    _title_bg_map                                                   ******** GX
+    _title_bg_tiles                                                 ******** GX
+    _update_bombs                                                   ******** GX
+    _update_cursor                                                  ******** GX
+    _update_music                                                   ******** GX
+    _update_rats                                                    ******** GX
+    _victory_bg_map                                                 ******** GX
+    _victory_bg_tiles                                               ******** GX
+    _victory_flag                                                   ******** GX
+    _wait_vbl_done                                                  ******** GX
+    _waitpadup                                                      ******** GX
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 2
+Hexadecimal [32-Bits]
+
+Symbol Table
+
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 3
+Hexadecimal [32-Bits]
+
+Area Table
+
+   0 _CODE                                      size      4DF   flags    0
+   1 _HRAM                                      size        0   flags    0
+   2 _DATA                                      size        0   flags    0
+   3 _INITIALIZED                               size        1   flags    0
+   4 _DABS                                      size        0   flags    8
+   5 _HOME                                      size        0   flags    0
+   6 _GSINIT                                    size        0   flags    0
+   7 _GSFINAL                                   size        0   flags    0
+   8 _INITIALIZER                               size        1   flags    0
+   9 _CABS                                      size        0   flags    8
+

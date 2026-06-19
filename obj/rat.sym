@@ -1,0 +1,48 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 1
+Hexadecimal [32-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =   00002710 L
+    .__.ABS.                                                    =   00000000 G
+    .__.CPU.                                                    =   00000000 L
+    .__.H$L.                                                    =   00000000 L
+    _OBP0_REG                                                       ******** GX
+  0 _RatSpriteData                                                  0000001B GR
+    __moduchar                                                      ******** GX
+  8 __xinit__game_over_flag                                         00000000 R
+  8 __xinit__victory_flag                                           00000001 R
+  3 _game_over_flag                                                 00000000 GR
+  0 _get_opposite                                                   00000000 R
+  0 _init_rats                                                      0000005B GR
+  0 _kill_rats_at                                                   0000140D GR
+    _maze                                                           ******** GX
+    _play_sfx_moan                                                  ******** GX
+    _play_sfx_plop                                                  ******** GX
+    _rand                                                           ******** GX
+  2 _rats                                                           00000000 R
+    _set_sprite_data                                                ******** GX
+    _shadow_OAM                                                     ******** GX
+  0 _spawn_rat                                                      000001E0 GR
+  0 _update_rats                                                    000006CF GR
+  2 _update_rats_frame_counter_10000_262                            00000078 R
+  2 _update_rats_single_rat_timer_10000_262                         00000079 R
+  3 _victory_flag                                                   00000001 GR
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 2
+Hexadecimal [32-Bits]
+
+Area Table
+
+   0 _CODE                                      size     14C1   flags    0
+   1 _HRAM                                      size        0   flags    0
+   2 _DATA                                      size       7B   flags    0
+   3 _INITIALIZED                               size        2   flags    0
+   4 _DABS                                      size        0   flags    8
+   5 _HOME                                      size        0   flags    0
+   6 _GSINIT                                    size        9   flags    0
+   7 _GSFINAL                                   size        0   flags    0
+   8 _INITIALIZER                               size        2   flags    0
+   9 _CABS                                      size        0   flags    8
+

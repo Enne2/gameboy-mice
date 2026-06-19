@@ -1,0 +1,278 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler
+                                      3 ; Version 4.5.1 #15267 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module cursor
+                                      6 	
+                                      7 ;--------------------------------------------------------
+                                      8 ; Public variables in this module
+                                      9 ;--------------------------------------------------------
+                                     10 	.globl _toggle_music
+                                     11 	.globl _drop_bomb
+                                     12 	.globl _set_sprite_data
+                                     13 	.globl _joypad
+                                     14 	.globl _CursorSpriteData
+                                     15 	.globl _init_cursor
+                                     16 	.globl _update_cursor
+                                     17 ;--------------------------------------------------------
+                                     18 ; special function registers
+                                     19 ;--------------------------------------------------------
+                                     20 	.area _HRAM
+                                     21 ;--------------------------------------------------------
+                                     22 ; ram data
+                                     23 ;--------------------------------------------------------
+                                     24 	.area _DATA
+    00000000                         25 _update_cursor_cursor_timer_10000_148:
+    00000000                         26 	.ds 1
+                                     27 ;--------------------------------------------------------
+                                     28 ; ram data
+                                     29 ;--------------------------------------------------------
+                                     30 	.area _INITIALIZED
+    00000000                         31 _cursor_x:
+    00000000                         32 	.ds 1
+    00000001                         33 _cursor_y:
+    00000001                         34 	.ds 1
+    00000002                         35 _previous_keys:
+    00000002                         36 	.ds 1
+    00000003                         37 _blink:
+    00000003                         38 	.ds 1
+                                     39 ;--------------------------------------------------------
+                                     40 ; absolute external ram data
+                                     41 ;--------------------------------------------------------
+                                     42 	.area _DABS (ABS)
+                                     43 ;--------------------------------------------------------
+                                     44 ; global & static initialisations
+                                     45 ;--------------------------------------------------------
+                                     46 	.area _HOME
+                                     47 	.area _GSINIT
+                                     48 	.area _GSFINAL
+                                     49 	.area _GSINIT
+                                     50 ;src/cursor.c:36: static uint8_t cursor_timer = 0;
+    00000000 AF               [ 4]   51 	xor	a, a
+    00000001 21r00r00         [12]   52 	ld	hl, #_update_cursor_cursor_timer_10000_148
+    00000004 77               [ 8]   53 	ld	(hl), a
+                                     54 ;--------------------------------------------------------
+                                     55 ; Home
+                                     56 ;--------------------------------------------------------
+                                     57 	.area _HOME
+                                     58 	.area _HOME
+                                     59 ;--------------------------------------------------------
+                                     60 ; code
+                                     61 ;--------------------------------------------------------
+                                     62 	.area _CODE
+                                     63 ;src/cursor.c:18: void init_cursor(void) {
+                                     64 ;	---------------------------------
+                                     65 ; Function init_cursor
+                                     66 ; ---------------------------------
+    00000000                         67 _init_cursor::
+                                     68 ;src/cursor.c:19: cursor_x = 1;
+    00000000 21r00r00         [12]   69 	ld	hl, #_cursor_x
+    00000003 36 01            [12]   70 	ld	(hl), #0x01
+                                     71 ;src/cursor.c:20: cursor_y = 1;
+    00000005 21r01r00         [12]   72 	ld	hl, #_cursor_y
+    00000008 36 01            [12]   73 	ld	(hl), #0x01
+                                     74 ;src/cursor.c:21: previous_keys = 0;
+                                     75 ;src/cursor.c:22: blink = 0;
+    0000000A AF               [ 4]   76 	xor	a, a
+    0000000B EAr02r00         [16]   77 	ld	(#_previous_keys), a
+    0000000E EAr03r00         [16]   78 	ld	(#_blink),a
+                                     79 ;src/cursor.c:26: set_sprite_data(4, 1, CursorSpriteData);
+    00000011 11r24r00         [12]   80 	ld	de, #_CursorSpriteData
+    00000014 D5               [16]   81 	push	de
+    00000015 21 04 01         [12]   82 	ld	hl, #0x104
+    00000018 E5               [16]   83 	push	hl
+    00000019 CDr00r00         [24]   84 	call	_set_sprite_data
+    0000001C E8 04            [16]   85 	add	sp, #4
+                                     86 ;/home/enne2/.local/gbdk/include/gb/gb.h:1887: shadow_OAM[nb].tile=tile;
+    0000001E 21r9Er00         [12]   87 	ld	hl, #(_shadow_OAM + 158)
+    00000021 36 04            [12]   88 	ld	(hl), #0x04
+                                     89 ;src/cursor.c:29: set_sprite_tile(39, 4); 
+                                     90 ;src/cursor.c:30: }
+    00000023 C9               [16]   91 	ret
+    00000024                         92 _CursorSpriteData:
+    00000024 FF                      93 	.db #0xff	; 255
+    00000025 FF                      94 	.db #0xff	; 255
+    00000026 81                      95 	.db #0x81	; 129
+    00000027 81                      96 	.db #0x81	; 129
+    00000028 81                      97 	.db #0x81	; 129
+    00000029 81                      98 	.db #0x81	; 129
+    0000002A 81                      99 	.db #0x81	; 129
+    0000002B 81                     100 	.db #0x81	; 129
+    0000002C 81                     101 	.db #0x81	; 129
+    0000002D 81                     102 	.db #0x81	; 129
+    0000002E 81                     103 	.db #0x81	; 129
+    0000002F 81                     104 	.db #0x81	; 129
+    00000030 81                     105 	.db #0x81	; 129
+    00000031 81                     106 	.db #0x81	; 129
+    00000032 FF                     107 	.db #0xff	; 255
+    00000033 FF                     108 	.db #0xff	; 255
+                                    109 ;src/cursor.c:32: void update_cursor(void) {
+                                    110 ;	---------------------------------
+                                    111 ; Function update_cursor
+                                    112 ; ---------------------------------
+    00000034                        113 _update_cursor::
+                                    114 ;src/cursor.c:33: uint8_t keys = joypad();
+    00000034 CDr00r00         [24]  115 	call	_joypad
+    00000037 4F               [ 4]  116 	ld	c, a
+                                    117 ;src/cursor.c:37: uint8_t moved = 0;
+    00000038 06 00            [ 8]  118 	ld	b, #0x00
+                                    119 ;src/cursor.c:40: uint8_t dpad = keys & (J_UP | J_DOWN | J_LEFT | J_RIGHT);
+    0000003A 79               [ 4]  120 	ld	a, c
+    0000003B E6 0F            [ 8]  121 	and	a, #0x0f
+    0000003D 5F               [ 4]  122 	ld	e, a
+                                    123 ;src/cursor.c:42: if (dpad) {
+    0000003E B7               [ 4]  124 	or	a, a
+    0000003F 28 22            [12]  125 	jr	Z, 00108$
+                                    126 ;src/cursor.c:43: if (cursor_timer == 0) {
+    00000041 FAr00r00         [16]  127 	ld	a, (#_update_cursor_cursor_timer_10000_148)
+    00000044 B7               [ 4]  128 	or	a, a
+    00000045 20 16            [12]  129 	jr	NZ, 00105$
+                                    130 ;src/cursor.c:44: moved = 1;
+    00000047 06 01            [ 8]  131 	ld	b, #0x01
+                                    132 ;src/cursor.c:46: if (!(previous_keys & dpad)) {
+    00000049 FAr02r00         [16]  133 	ld	a, (#_previous_keys)
+    0000004C A3               [ 4]  134 	and	a, e
+    0000004D 20 07            [12]  135 	jr	NZ, 00102$
+                                    136 ;src/cursor.c:47: cursor_timer = 12; // Initial delay
+    0000004F 21r00r00         [12]  137 	ld	hl, #_update_cursor_cursor_timer_10000_148
+    00000052 36 0C            [12]  138 	ld	(hl), #0x0c
+    00000054 18 11            [12]  139 	jr	00109$
+    00000056                        140 00102$:
+                                    141 ;src/cursor.c:49: cursor_timer = 6;  // Repeat delay (il moltiplicatore di velocità)
+    00000056 21r00r00         [12]  142 	ld	hl, #_update_cursor_cursor_timer_10000_148
+    00000059 36 06            [12]  143 	ld	(hl), #0x06
+    0000005B 18 0A            [12]  144 	jr	00109$
+    0000005D                        145 00105$:
+                                    146 ;src/cursor.c:52: cursor_timer--;
+    0000005D 21r00r00         [12]  147 	ld	hl, #_update_cursor_cursor_timer_10000_148
+    00000060 35               [12]  148 	dec	(hl)
+    00000061 18 04            [12]  149 	jr	00109$
+    00000063                        150 00108$:
+                                    151 ;src/cursor.c:55: cursor_timer = 0; // Azzera il timer se si rilasciano le frecce
+    00000063 AF               [ 4]  152 	xor	a, a
+    00000064 EAr00r00         [16]  153 	ld	(#_update_cursor_cursor_timer_10000_148),a
+    00000067                        154 00109$:
+                                    155 ;src/cursor.c:58: if (moved) {
+    00000067 78               [ 4]  156 	ld	a, b
+    00000068 B7               [ 4]  157 	or	a, a
+    00000069 28 3A            [12]  158 	jr	Z, 00130$
+                                    159 ;src/cursor.c:59: if (keys & J_UP) {
+    0000006B CB 51            [ 8]  160 	bit	2, c
+    0000006D 28 0B            [12]  161 	jr	Z, 00127$
+                                    162 ;src/cursor.c:60: if (cursor_y > 1) cursor_y--;
+    0000006F 3E 01            [ 8]  163 	ld	a, #0x01
+    00000071 21r01r00         [12]  164 	ld	hl, #_cursor_y
+    00000074 96               [ 8]  165 	sub	a, (hl)
+    00000075 30 2E            [12]  166 	jr	NC, 00130$
+    00000077 35               [12]  167 	dec	(hl)
+    00000078 18 2B            [12]  168 	jr	00130$
+    0000007A                        169 00127$:
+                                    170 ;src/cursor.c:61: } else if (keys & J_DOWN) {
+    0000007A CB 59            [ 8]  171 	bit	3, c
+    0000007C 28 0B            [12]  172 	jr	Z, 00124$
+                                    173 ;src/cursor.c:62: if (cursor_y < MAZE_HEIGHT - 2) cursor_y++;
+    0000007E 21r01r00         [12]  174 	ld	hl, #_cursor_y
+    00000081 7E               [ 8]  175 	ld	a, (hl)
+    00000082 D6 0F            [ 8]  176 	sub	a, #0x0f
+    00000084 30 1F            [12]  177 	jr	NC, 00130$
+    00000086 34               [12]  178 	inc	(hl)
+    00000087 18 1C            [12]  179 	jr	00130$
+    00000089                        180 00124$:
+                                    181 ;src/cursor.c:63: } else if (keys & J_LEFT) {
+    00000089 CB 49            [ 8]  182 	bit	1, c
+    0000008B 28 0B            [12]  183 	jr	Z, 00121$
+                                    184 ;src/cursor.c:64: if (cursor_x > 1) cursor_x--;
+    0000008D 3E 01            [ 8]  185 	ld	a, #0x01
+    0000008F 21r00r00         [12]  186 	ld	hl, #_cursor_x
+    00000092 96               [ 8]  187 	sub	a, (hl)
+    00000093 30 10            [12]  188 	jr	NC, 00130$
+    00000095 35               [12]  189 	dec	(hl)
+    00000096 18 0D            [12]  190 	jr	00130$
+    00000098                        191 00121$:
+                                    192 ;src/cursor.c:65: } else if (keys & J_RIGHT) {
+    00000098 CB 41            [ 8]  193 	bit	0, c
+    0000009A 28 09            [12]  194 	jr	Z, 00130$
+                                    195 ;src/cursor.c:66: if (cursor_x < MAZE_WIDTH - 2) cursor_x++;
+    0000009C 21r00r00         [12]  196 	ld	hl, #_cursor_x
+    0000009F 7E               [ 8]  197 	ld	a, (hl)
+    000000A0 D6 11            [ 8]  198 	sub	a, #0x11
+    000000A2 30 01            [12]  199 	jr	NC, 00130$
+    000000A4 34               [12]  200 	inc	(hl)
+    000000A5                        201 00130$:
+                                    202 ;src/cursor.c:71: if ((keys & J_A) && !(previous_keys & J_A)) {
+    000000A5 CB 61            [ 8]  203 	bit	4, c
+    000000A7 28 13            [12]  204 	jr	Z, 00132$
+    000000A9 FAr02r00         [16]  205 	ld	a, (_previous_keys)
+    000000AC CB 67            [ 8]  206 	bit	4, a
+    000000AE 20 0C            [12]  207 	jr	NZ, 00132$
+                                    208 ;src/cursor.c:72: drop_bomb(cursor_x, cursor_y);
+    000000B0 C5               [16]  209 	push	bc
+    000000B1 FAr01r00         [16]  210 	ld	a, (_cursor_y)
+    000000B4 5F               [ 4]  211 	ld	e, a
+    000000B5 FAr00r00         [16]  212 	ld	a, (_cursor_x)
+    000000B8 CDr00r00         [24]  213 	call	_drop_bomb
+    000000BB C1               [12]  214 	pop	bc
+    000000BC                        215 00132$:
+                                    216 ;src/cursor.c:76: if ((keys & J_SELECT) && !(previous_keys & J_SELECT)) {
+    000000BC CB 71            [ 8]  217 	bit	6, c
+    000000BE 28 0C            [12]  218 	jr	Z, 00135$
+    000000C0 FAr02r00         [16]  219 	ld	a, (_previous_keys)
+    000000C3 CB 77            [ 8]  220 	bit	6, a
+    000000C5 20 05            [12]  221 	jr	NZ, 00135$
+                                    222 ;src/cursor.c:77: toggle_music();
+    000000C7 C5               [16]  223 	push	bc
+    000000C8 CDr00r00         [24]  224 	call	_toggle_music
+    000000CB C1               [12]  225 	pop	bc
+    000000CC                        226 00135$:
+                                    227 ;src/cursor.c:80: previous_keys = keys;
+    000000CC 21r02r00         [12]  228 	ld	hl, #_previous_keys
+    000000CF 71               [ 8]  229 	ld	(hl), c
+                                    230 ;src/cursor.c:83: blink++;
+    000000D0 21r03r00         [12]  231 	ld	hl, #_blink
+    000000D3 34               [12]  232 	inc	(hl)
+                                    233 ;src/cursor.c:84: if (blink & 0x10) {
+    000000D4 7E               [ 8]  234 	ld	a, (hl)
+    000000D5 CB 67            [ 8]  235 	bit	4, a
+    000000D7 28 09            [12]  236 	jr	Z, 00138$
+                                    237 ;/home/enne2/.local/gbdk/include/gb/gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    000000D9 21r9Cr00         [12]  238 	ld	hl, #(_shadow_OAM + 156)
+                                    239 ;/home/enne2/.local/gbdk/include/gb/gb.h:1974: itm->y=y, itm->x=x;
+    000000DC 36 00            [12]  240 	ld	(hl), #0x00
+    000000DE 23               [ 8]  241 	inc	hl
+    000000DF 36 00            [12]  242 	ld	(hl), #0x00
+                                    243 ;src/cursor.c:85: move_sprite(39, 0, 0); // Nascondi spostandolo fuori schermo
+    000000E1 C9               [16]  244 	ret
+    000000E2                        245 00138$:
+                                    246 ;src/cursor.c:88: move_sprite(39, cursor_x * 8 + 12, cursor_y * 8 + 20);
+    000000E2 FAr01r00         [16]  247 	ld	a, (_cursor_y)
+    000000E5 87               [ 4]  248 	add	a, a
+    000000E6 87               [ 4]  249 	add	a, a
+    000000E7 87               [ 4]  250 	add	a, a
+    000000E8 C6 14            [ 8]  251 	add	a, #0x14
+    000000EA 47               [ 4]  252 	ld	b, a
+    000000EB FAr00r00         [16]  253 	ld	a, (_cursor_x)
+    000000EE 87               [ 4]  254 	add	a, a
+    000000EF 87               [ 4]  255 	add	a, a
+    000000F0 87               [ 4]  256 	add	a, a
+    000000F1 C6 0C            [ 8]  257 	add	a, #0x0c
+    000000F3 4F               [ 4]  258 	ld	c, a
+                                    259 ;/home/enne2/.local/gbdk/include/gb/gb.h:1973: OAM_item_t * itm = &shadow_OAM[nb];
+    000000F4 21r9Cr00         [12]  260 	ld	hl, #(_shadow_OAM + 156)
+                                    261 ;/home/enne2/.local/gbdk/include/gb/gb.h:1974: itm->y=y, itm->x=x;
+    000000F7 70               [ 8]  262 	ld	(hl), b
+    000000F8 23               [ 8]  263 	inc	hl
+    000000F9 71               [ 8]  264 	ld	(hl), c
+                                    265 ;src/cursor.c:88: move_sprite(39, cursor_x * 8 + 12, cursor_y * 8 + 20);
+                                    266 ;src/cursor.c:90: }
+    000000FA C9               [16]  267 	ret
+                                    268 	.area _CODE
+                                    269 	.area _INITIALIZER
+    00000000                        270 __xinit__cursor_x:
+    00000000 01                     271 	.db #0x01	; 1
+    00000001                        272 __xinit__cursor_y:
+    00000001 01                     273 	.db #0x01	; 1
+    00000002                        274 __xinit__previous_keys:
+    00000002 00                     275 	.db #0x00	; 0
+    00000003                        276 __xinit__blink:
+    00000003 00                     277 	.db #0x00	; 0
+                                    278 	.area _CABS (ABS)

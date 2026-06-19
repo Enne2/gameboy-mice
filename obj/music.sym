@@ -1,0 +1,101 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 1
+Hexadecimal [32-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =   00002710 L
+    .__.ABS.                                                    =   00000000 G
+    .__.CPU.                                                    =   00000000 L
+    .__.H$L.                                                    =   00000000 L
+    _NR10_REG                                                       ******** GX
+    _NR11_REG                                                       ******** GX
+    _NR12_REG                                                       ******** GX
+    _NR13_REG                                                       ******** GX
+    _NR14_REG                                                       ******** GX
+    _NR21_REG                                                       ******** GX
+    _NR22_REG                                                       ******** GX
+    _NR23_REG                                                       ******** GX
+    _NR24_REG                                                       ******** GX
+    _NR30_REG                                                       ******** GX
+    _NR32_REG                                                       ******** GX
+    _NR33_REG                                                       ******** GX
+    _NR34_REG                                                       ******** GX
+    _NR41_REG                                                       ******** GX
+    _NR42_REG                                                       ******** GX
+    _NR43_REG                                                       ******** GX
+    _NR44_REG                                                       ******** GX
+    _NR50_REG                                                       ******** GX
+    _NR51_REG                                                       ******** GX
+    _NR52_REG                                                       ******** GX
+  8 __xinit__frame_counter                                          00000002 R
+  8 __xinit__game_over_mode                                         00000004 R
+  8 __xinit__music_enabled                                          00000005 R
+  8 __xinit__sfx_timer                                              00000003 R
+  8 __xinit__tick                                                   00000000 R
+  0 _arp_parts                                                      00000229 GR
+  0 _bass_parts                                                     00000639 GR
+  0 _drum_parts                                                     00000751 GR
+  3 _frame_counter                                                  00000002 R
+  3 _game_over_mode                                                 00000004 R
+  0 _go_arp                                                         00000859 GR
+  0 _go_bass                                                        000007D9 GR
+  0 _go_drum                                                        000008D9 GR
+  0 _go_mel                                                         00000759 GR
+  0 _init_music                                                     000009CC GR
+  0 _mel_parts                                                      00000431 GR
+  3 _music_enabled                                                  00000005 GR
+  0 _play_game_over_music                                           00000DEA GR
+  0 _play_sfx_bomb_drop                                             00000E14 GR
+  0 _play_sfx_explosion                                             00000E02 GR
+  0 _play_sfx_moan                                                  00000999 GR
+  0 _play_sfx_plop                                                  000009B3 GR
+  0 _play_title_music                                               00000E2A GR
+  0 _play_victory_music                                             00000E75 GR
+  3 _sfx_timer                                                      00000003 R
+  3 _tick                                                           00000000 R
+  0 _title_bass                                                     00000939 GR
+  0 _title_mel                                                      00000919 GR
+  0 _toggle_music                                                   00000000 GR
+  0 _trk_arp_0                                                      00000029 GR
+  0 _trk_arp_1                                                      000000A9 GR
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 2
+Hexadecimal [32-Bits]
+
+Symbol Table
+
+  0 _trk_arp_2                                                      00000129 GR
+  0 _trk_arp_3                                                      000001A9 GR
+  0 _trk_bass_0                                                     00000439 GR
+  0 _trk_bass_1                                                     000004B9 GR
+  0 _trk_bass_2                                                     00000539 GR
+  0 _trk_bass_3                                                     000005B9 GR
+  0 _trk_drum_0                                                     00000651 GR
+  0 _trk_drum_1                                                     00000691 GR
+  0 _trk_drum_2                                                     000006D1 GR
+  0 _trk_drum_3                                                     00000711 GR
+  0 _trk_mel_0                                                      00000231 GR
+  0 _trk_mel_1                                                      000002B1 GR
+  0 _trk_mel_2                                                      00000331 GR
+  0 _trk_mel_3                                                      000003B1 GR
+  0 _update_music                                                   00000A0E GR
+  0 _victory_bass                                                   00000979 GR
+  0 _victory_mel                                                    00000959 GR
+  0 _wave_ram                                                       00000641 GR
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 3
+Hexadecimal [32-Bits]
+
+Area Table
+
+   0 _CODE                                      size      EC0   flags    0
+   1 _HRAM                                      size        0   flags    0
+   2 _DATA                                      size        0   flags    0
+   3 _INITIALIZED                               size        6   flags    0
+   4 _DABS                                      size        0   flags    8
+   5 _HOME                                      size        0   flags    0
+   6 _GSINIT                                    size        0   flags    0
+   7 _GSFINAL                                   size        0   flags    0
+   8 _INITIALIZER                               size        6   flags    0
+   9 _CABS                                      size        0   flags    8
+

@@ -1,0 +1,40 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 1
+Hexadecimal [32-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =   00002710 L
+    .__.ABS.                                                    =   00000000 G
+    .__.CPU.                                                    =   00000000 L
+    .__.H$L.                                                    =   00000000 L
+    _BombSpriteData                                                 ******** GX
+  2 _bomb                                                           00000000 R
+  0 _do_explosion_damage                                            0000007F R
+  0 _drop_bomb                                                      00000041 GR
+  0 _exp_sprite_pool                                                00000034 R
+  0 _hide_explosion                                                 0000005D R
+  0 _init_bombs                                                     00000000 GR
+    _kill_rats_at                                                   ******** GX
+    _maze                                                           ******** GX
+    _play_sfx_bomb_drop                                             ******** GX
+    _play_sfx_explosion                                             ******** GX
+    _set_sprite_data                                                ******** GX
+    _shadow_OAM                                                     ******** GX
+  0 _update_bombs                                                   00000082 GR
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (GameBoy)                  Page 2
+Hexadecimal [32-Bits]
+
+Area Table
+
+   0 _CODE                                      size      301   flags    0
+   1 _HRAM                                      size        0   flags    0
+   2 _DATA                                      size        5   flags    0
+   3 _INITIALIZED                               size        0   flags    0
+   4 _DABS                                      size        0   flags    8
+   5 _HOME                                      size        0   flags    0
+   6 _GSINIT                                    size        0   flags    0
+   7 _GSFINAL                                   size        0   flags    0
+   8 _INITIALIZER                               size        0   flags    0
+   9 _CABS                                      size        0   flags    8
+

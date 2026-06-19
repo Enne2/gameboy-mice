@@ -1,0 +1,33 @@
+XL4
+H A areas 2 global symbols
+M bomb_gfx
+S .__.ABS. Def00000000
+A _CODE size 60 flags 0 addr 0
+S _BombSpriteData Def00000000
+A _HRAM size 0 flags 0 addr 0
+A _DATA size 0 flags 0 addr 0
+A _INITIALIZED size 0 flags 0 addr 0
+A _DABS size 0 flags 8 addr 0
+A _HOME size 0 flags 0 addr 0
+A _GSINIT size 0 flags 0 addr 0
+A _GSFINAL size 0 flags 0 addr 0
+A _INITIALIZER size 0 flags 0 addr 0
+A _CABS size 0 flags 8 addr 0
+T 00 00 00 00
+R 00 00 00 00
+T 00 00 00 00 18 18 3C 3C 7E 7E 7E 7E 7E 7E 7E 7E
+R 00 00 00 00
+T 0C 00 00 00 3C 3C 00 00 00 00 18 18 3C 3C 7E 7E
+R 00 00 00 00
+T 18 00 00 00 7E 7E 3C 3C 00 00 00 00 00 00 00 00
+R 00 00 00 00
+T 24 00 00 00 18 18 3C 3C 3C 3C 18 18 00 00 00 00
+R 00 00 00 00
+T 30 00 00 00 C3 C3 A5 A5 3C 3C 7E 7E 7E 7E 3C 3C
+R 00 00 00 00
+T 3C 00 00 00 A5 A5 C3 C3 00 00 00 00 FF FF 7E 7E
+R 00 00 00 00
+T 48 00 00 00 7E 7E FF FF 00 00 00 00 3C 3C 3C 3C
+R 00 00 00 00
+T 54 00 00 00 7E 7E 7E 7E 7E 7E 7E 7E 3C 3C 3C 3C
+R 00 00 00 00
